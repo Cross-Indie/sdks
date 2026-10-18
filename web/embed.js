@@ -188,6 +188,11 @@
     var container = resolveEl(opts.el || "crossindie-banner");
     var category = opts.category || "game";
     var format = opts.format || "card";
+    // Viewer language for targeting (falls back to the browser locale).
+    var lang =
+      opts.lang ||
+      ((navigator.language || navigator.userLanguage || "").slice(0, 2));
+    var country = opts.country || "";
 
     function fail(err) {
       if (typeof opts.onError === "function") opts.onError(err);
@@ -207,7 +212,9 @@
       "/api/v1/ad/fetch?app_id=" +
       encodeURIComponent(opts.appId) +
       "&category=" +
-      encodeURIComponent(category);
+      encodeURIComponent(category) +
+      (lang ? "&lang=" + encodeURIComponent(lang) : "") +
+      (country ? "&country=" + encodeURIComponent(country) : "");
 
     return fetch(url, { headers: { Accept: "application/json" } })
       .then(function (res) {
@@ -238,6 +245,7 @@
         appId: n.getAttribute("data-ci-app-id"),
         category: n.getAttribute("data-ci-category") || "game",
         format: n.getAttribute("data-ci-format") || "card",
+        country: n.getAttribute("data-ci-country") || "",
         apiBase: n.getAttribute("data-ci-api-base") || defaultApiBase,
       });
     }
@@ -264,6 +272,7 @@
         appId: singleAppId,
         category: script.getAttribute("data-category") || "game",
         format: script.getAttribute("data-format") || "card",
+        country: script.getAttribute("data-country") || "",
         apiBase: apiBase,
       });
     }

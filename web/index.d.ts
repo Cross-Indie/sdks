@@ -19,6 +19,10 @@ export interface CreateBannerOptions {
   category?: CrossIndieCategory;
   /** Banner format / size. Defaults to "card". */
   format?: CrossIndieFormat;
+  /** Viewer language for targeting (2-letter). Defaults to navigator.language. */
+  lang?: string;
+  /** Viewer country code for targeting (e.g. "US"). */
+  country?: string;
   /** Base URL of your CrossIndie backend, e.g. "https://api.crossindie.dev". */
   apiBase: string;
   /** Called on fetch/render errors instead of console.warn. */
