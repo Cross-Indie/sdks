@@ -1,0 +1,23 @@
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+
+# Node (web SDK)
+node_modules/
+
+# Godot
+.godot/
+
+# Unity
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+*.csproj
+*.sln
+
+# Unreal
+Binaries/
+Intermediate/
+Saved/
+DerivedDataCache/

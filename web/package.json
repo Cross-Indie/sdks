@@ -1,0 +1,14 @@
+{
+  "name": "@crossindie/web",
+  "version": "1.0.0",
+  "description": "Zero-dependency cross-promotion banner widget for CrossIndie (<4KB).",
+  "main": "embed.js",
+  "module": "embed.js",
+  "types": "index.d.ts",
+  "unpkg": "embed.js",
+  "jsdelivr": "embed.js",
+  "files": ["embed.js", "index.d.ts", "README.md"],
+  "keywords": ["crossindie", "cross-promotion", "indie", "banner", "ads"],
+  "sideEffects": true,
+  "license": "MIT"
+}

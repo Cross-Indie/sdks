@@ -1,0 +1,15 @@
+[gd_scene load_steps=2 format=3 uid="uid://cross_indie_banner"]
+
+[ext_resource type="Script" path="res://addons/cross_indie/CrossIndieBanner.gd" id="1_banner"]
+
+[node name="CrossIndieBanner" type="Control"]
+custom_minimum_size = Vector2(320, 180)
+layout_mode = 3
+anchors_preset = 0
+offset_right = 320.0
+offset_bottom = 180.0
+mouse_filter = 0
+script = ExtResource("1_banner")
+api_base = "http://localhost:8000"
+category = "game"
+auto_load = true

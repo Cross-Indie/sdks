@@ -1,0 +1,10 @@
+{
+  "name": "com.crossindie.banner",
+  "version": "1.0.0",
+  "displayName": "CrossIndie Banner",
+  "description": "Zero-dependency cross-promotion banner for Unity. Shows other indie games and earns credits to promote yours.",
+  "unity": "2021.3",
+  "keywords": ["crossindie", "cross-promotion", "ads", "indie"],
+  "author": { "name": "CrossIndie" },
+  "license": "MIT"
+}
