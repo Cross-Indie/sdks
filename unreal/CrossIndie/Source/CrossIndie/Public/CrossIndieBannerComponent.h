@@ -29,7 +29,7 @@ class CROSSINDIE_API UCrossIndieBannerComponent : public UActorComponent
 public:
     UCrossIndieBannerComponent();
 
-    /** Base URL of your CrossIndie backend, e.g. https://api.crossindie.dev */
+    /** Base URL of your CrossIndie backend, e.g. https://api.crossindie.com */
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CrossIndie")
     FString ApiBase = TEXT("http://localhost:8000");
 

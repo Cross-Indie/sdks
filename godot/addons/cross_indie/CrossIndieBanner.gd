@@ -14,7 +14,7 @@ signal ad_failed(reason: String)
 signal impression_tracked
 signal clicked
 
-## Base URL of your CrossIndie backend, e.g. "https://api.crossindie.dev".
+## Base URL of your CrossIndie backend, e.g. "https://api.crossindie.com".
 @export var api_base: String = "http://localhost:8000"
 ## The app_id of THIS game (from your CrossIndie dashboard).
 @export var app_id: String = ""

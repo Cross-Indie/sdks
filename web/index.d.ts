@@ -23,7 +23,7 @@ export interface CreateBannerOptions {
   lang?: string;
   /** Viewer country code for targeting (e.g. "US"). */
   country?: string;
-  /** Base URL of your CrossIndie backend, e.g. "https://api.crossindie.dev". */
+  /** Base URL of your CrossIndie backend, e.g. "https://api.crossindie.com". */
   apiBase: string;
   /** Called on fetch/render errors instead of console.warn. */
   onError?: (err: Error) => void;

@@ -17,7 +17,7 @@ In the Inspector or from code:
 @onready var banner := $CrossIndieBanner
 
 func _ready() -> void:
-    banner.api_base = "https://api.crossindie.dev"  # your backend
+    banner.api_base = "https://api.crossindie.com"  # your backend
     banner.app_id   = "YOUR_APP_ID"                 # from the dashboard
     banner.category = "game"                         # game | web_tool | saas | mobile_app
     banner.auto_load = true                          # fetch on ready

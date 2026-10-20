@@ -20,7 +20,7 @@ project's `Packages/`. (You can also point UPM at a git URL once published.)
 
 ```csharp
 var banner = rawImage.gameObject.AddComponent<CrossIndie.CrossIndieBanner>();
-banner.apiBase = "https://api.crossindie.dev";
+banner.apiBase = "https://api.crossindie.com";
 banner.appId   = "YOUR_APP_ID";
 banner.category = "game";
 banner.LoadAd();

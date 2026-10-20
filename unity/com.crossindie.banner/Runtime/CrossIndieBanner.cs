@@ -21,7 +21,7 @@ namespace CrossIndie
     public class CrossIndieBanner : MonoBehaviour, IPointerClickHandler
     {
         [Header("Config")]
-        [Tooltip("Base URL of your CrossIndie backend, e.g. https://api.crossindie.dev")]
+        [Tooltip("Base URL of your CrossIndie backend, e.g. https://api.crossindie.com")]
         public string apiBase = "http://localhost:8000";
 
         [Tooltip("This game's app id from the CrossIndie dashboard.")]

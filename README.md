@@ -1,6 +1,6 @@
 # CrossIndie SDKs
 
-Official, open-source client SDKs for [CrossIndie](https://crossindie.dev) — the
+Official, open-source client SDKs for [CrossIndie](https://crossindie.com) — the
 zero-bloat cross-promotion network for indie games, apps, web tools and
 micro-SaaS. Drop in one banner, earn credits by hosting other indies, spend
 them to get discovered.
