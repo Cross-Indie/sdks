@@ -25,6 +25,11 @@ export interface CreateBannerOptions {
   country?: string;
   /** Base URL of your CrossIndie backend, e.g. "https://api.crossindie.com". */
   apiBase: string;
+  /** Allow a (heavier) looping video banner when the connection can spare it.
+   *  Defaults to true; the SDK still falls back to the static image on
+   *  data-saver / slow (2g) links and when the ad has no video. Set false to
+   *  never request video. */
+  video?: boolean;
   /** Called on fetch/render errors instead of console.warn. */
   onError?: (err: Error) => void;
 }

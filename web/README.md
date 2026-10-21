@@ -4,6 +4,11 @@ Zero-dependency cross-promotion banner for websites, web tools and micro-SaaS.
 Lightweight (~2KB gzipped), no build step, no tracking bloat. Supports multiple
 slots and standard formats (card, rectangle, leaderboard, mobile, text).
 
+Video-capable: when an advertiser supplies a short looping video banner, the
+widget serves it to web viewers automatically — lazy-loaded only once the slot
+is actually visible, and gracefully falling back to the static image on
+data-saver or slow (2g) connections. Pass `video: false` to opt out.
+
 ## Install
 
 Via the hosted script (served by your CrossIndie backend at `/embed.js`), or

@@ -65,6 +65,12 @@
 
   function render(container, apiBase, ad, format) {
     var f = FORMATS[format] || FORMATS.card;
+    // Media may come back as a relative "/media/..." path; since the widget runs
+    // on arbitrary third-party sites, resolve it against the API origin (not the
+    // host page) so it loads regardless of the operator's MEDIA_URL_BASE.
+    function media(u) {
+      return u && u.charAt(0) === "/" ? apiBase + u : u;
+    }
     var minMs = ad.min_display_ms || 1500;
     var tracked = false;
     var clicked = false;
@@ -83,21 +89,35 @@
     wrap.target = "_blank";
     wrap.rel = "noopener noreferrer sponsored";
 
-    var showImg = f.img !== false && ad.banner_image_url;
-    if (showImg) {
+    var mediaCss = f.horizontal
+      ? "flex:0 0 " + f.imgW + "px;width:" + f.imgW + "px;height:100%;object-fit:cover;display:block"
+      : "display:block;width:100%;" +
+        (f.imgH ? "height:" + f.imgH + "px;" : "aspect-ratio:" + f.imgRatio + ";") +
+        "object-fit:cover";
+
+    // A video banner (served only to a video-capable surface) is lazy-loaded:
+    // its src is set only once the slot scrolls into view (see the observer
+    // below), so a slot the viewer never sees costs them zero bytes.
+    var videoEl = null;
+    if (f.img !== false && ad.video_url) {
+      videoEl = el("video");
+      videoEl.muted = true;
+      videoEl.loop = true;
+      videoEl.autoplay = true;
+      videoEl.setAttribute("muted", "");
+      videoEl.setAttribute("playsinline", "");
+      videoEl.playsInline = true;
+      videoEl.preload = "none";
+      if (ad.banner_image_url) videoEl.poster = media(ad.banner_image_url);
+      videoEl._src = media(ad.video_url);
+      videoEl.style.cssText = mediaCss + ";background:#0a0a0c";
+      wrap.appendChild(videoEl);
+    } else if (f.img !== false && ad.banner_image_url) {
       var img = el("img");
-      img.src = ad.banner_image_url;
+      img.src = media(ad.banner_image_url);
       img.alt = ad.name;
       img.loading = "lazy";
-      if (f.horizontal) {
-        img.style.cssText =
-          "flex:0 0 " + f.imgW + "px;width:" + f.imgW + "px;height:100%;object-fit:cover;display:block";
-      } else {
-        img.style.cssText =
-          "display:block;width:100%;" +
-          (f.imgH ? "height:" + f.imgH + "px;" : "aspect-ratio:" + f.imgRatio + ";") +
-          "object-fit:cover";
-      }
+      img.style.cssText = mediaCss;
       wrap.appendChild(img);
     }
 
@@ -160,12 +180,21 @@
       function (entries) {
         entries.forEach(function (entry) {
           if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+            // Lazy-load the video only now that the slot is actually visible.
+            if (videoEl && !videoEl.src) {
+              videoEl.src = videoEl._src;
+              var pl = videoEl.play();
+              if (pl && pl.catch) pl.catch(function () {});
+            }
             if (!dwellTimer && !tracked) {
               dwellTimer = setTimeout(reportImpression, minMs);
             }
-          } else if (dwellTimer) {
-            clearTimeout(dwellTimer);
-            dwellTimer = null;
+          } else {
+            if (videoEl && videoEl.src) videoEl.pause();
+            if (dwellTimer) {
+              clearTimeout(dwellTimer);
+              dwellTimer = null;
+            }
           }
         });
       },
@@ -207,6 +236,13 @@
       return Promise.resolve(fail(new Error("target element not found")));
     }
 
+    // Only ask for a (heavier) video banner when the connection can spare it:
+    // never on data-saver or a 2g link. The viewer's data is sacred.
+    var conn = navigator.connection;
+    var videoOk =
+      opts.video !== false &&
+      !(conn && (conn.saveData || /(^|[^3])2g$/.test(conn.effectiveType || "")));
+
     var url =
       apiBase +
       "/api/v1/ad/fetch?app_id=" +
@@ -214,7 +250,8 @@
       "&category=" +
       encodeURIComponent(category) +
       (lang ? "&lang=" + encodeURIComponent(lang) : "") +
-      (country ? "&country=" + encodeURIComponent(country) : "");
+      (country ? "&country=" + encodeURIComponent(country) : "") +
+      (videoOk ? "&video=1" : "");
 
     return fetch(url, { headers: { Accept: "application/json" } })
       .then(function (res) {
