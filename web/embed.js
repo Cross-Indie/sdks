@@ -75,15 +75,25 @@
     var tracked = false;
     var clicked = false;
 
-    var wrap = el(
-      "a",
-      "display:flex;" +
+    // The outer card is a plain container, not a link: the artwork + title +
+    // description link to the advertiser, while the "Promoted with CrossIndie"
+    // badge is its OWN link to crossindie.com. (An <a> can't be nested inside
+    // another <a>, so the two destinations must be sibling anchors.)
+    var card = el(
+      "div",
+      "position:relative;display:flex;" +
         (f.horizontal ? "flex-direction:row;align-items:stretch;" : "flex-direction:column;") +
         "box-sizing:border-box;width:100%;max-width:" + f.w + "px;" +
         (f.h ? "height:" + f.h + "px;" : "") +
         "border:1px solid #27272a;border-radius:" + (f.h && f.h <= 50 ? 8 : 12) + "px;" +
-        "overflow:hidden;background:#141210;color:#f5f3ef;text-decoration:none;" +
+        "overflow:hidden;background:#141210;color:#f5f3ef;" +
         "font-family:system-ui,sans-serif"
+    );
+    var wrap = el(
+      "a",
+      "display:flex;flex:1;min-width:0;" +
+        (f.horizontal ? "flex-direction:row;align-items:stretch;" : "flex-direction:column;") +
+        "color:inherit;text-decoration:none"
     );
     wrap.href = ad.target_url;
     wrap.target = "_blank";
@@ -144,20 +154,28 @@
         )
       );
     }
-    if (f.badge) {
-      body.appendChild(
-        el(
-          "div",
-          "font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#78716c;margin-top:" +
-            (f.horizontal ? "2px" : "8px"),
-          "Promoted with CrossIndie"
-        )
-      );
-    }
     wrap.appendChild(body);
+    card.appendChild(wrap);
+
+    // Attribution badge: a separate link to the CrossIndie site. A subtle pill
+    // keeps it legible wherever it overlays the card's bottom-right corner.
+    if (f.badge) {
+      var badge = el(
+        "a",
+        "position:absolute;right:6px;bottom:6px;z-index:2;" +
+          "font-size:9px;line-height:1.2;letter-spacing:.1em;text-transform:uppercase;" +
+          "color:#d6d3cd;background:rgba(10,10,12,.72);padding:2px 6px;border-radius:6px;" +
+          "text-decoration:none;font-family:system-ui,sans-serif",
+        "Promoted with CrossIndie"
+      );
+      badge.href = "https://crossindie.com";
+      badge.target = "_blank";
+      badge.rel = "noopener noreferrer";
+      card.appendChild(badge);
+    }
 
     container.innerHTML = "";
-    container.appendChild(wrap);
+    container.appendChild(card);
 
     wrap.addEventListener("click", function () {
       if (clicked) return;
@@ -200,7 +218,7 @@
       },
       { threshold: [0, 0.5, 1] }
     );
-    observer.observe(wrap);
+    observer.observe(card);
   }
 
   /**
