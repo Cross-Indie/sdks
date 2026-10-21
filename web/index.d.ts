@@ -30,6 +30,9 @@ export interface CreateBannerOptions {
    *  data-saver / slow (2g) links and when the ad has no video. Set false to
    *  never request video. */
   video?: boolean;
+  /** Show a small ✕ that lets the viewer dismiss the slot. Defaults to true;
+   *  set false to hide it (a dismissed slot earns nothing). */
+  close?: boolean;
   /** Called on fetch/render errors instead of console.warn. */
   onError?: (err: Error) => void;
 }

@@ -63,7 +63,7 @@
     return n;
   }
 
-  function render(container, apiBase, ad, format) {
+  function render(container, apiBase, ad, format, closeable) {
     var f = FORMATS[format] || FORMATS.card;
     // Media may come back as a relative "/media/..." path; since the widget runs
     // on arbitrary third-party sites, resolve it against the API origin (not the
@@ -174,6 +174,31 @@
       card.appendChild(badge);
     }
 
+    // Small universal ✕ to dismiss the slot — an icon, not a word, so it needs
+    // no translation. Dismissing just hides the slot client-side; since it
+    // usually happens before the dwell time, no impression is recorded and
+    // nothing is charged or earned.
+    if (closeable !== false) {
+      var close = el(
+        "button",
+        "position:absolute;top:5px;right:5px;z-index:3;width:18px;height:18px;" +
+          "display:flex;align-items:center;justify-content:center;padding:0;" +
+          "border:0;border-radius:50%;cursor:pointer;line-height:1;" +
+          "background:rgba(10,10,12,.55);color:#f5f3ef;" +
+          "font:14px/1 system-ui,sans-serif",
+        "×"
+      );
+      close.type = "button";
+      close.setAttribute("aria-label", "Close");
+      close.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (observer) observer.disconnect();
+        container.innerHTML = "";
+      });
+      card.appendChild(close);
+    }
+
     container.innerHTML = "";
     container.appendChild(card);
 
@@ -240,6 +265,9 @@
       opts.lang ||
       ((navigator.language || navigator.userLanguage || "").slice(0, 2));
     var country = opts.country || "";
+    // A small ✕ lets the viewer dismiss the slot. On by default; pass
+    // close:false to hide it (e.g. when a dismissed slot would waste earnings).
+    var closeable = opts.close !== false;
 
     function fail(err) {
       if (typeof opts.onError === "function") opts.onError(err);
@@ -279,7 +307,7 @@
       })
       .then(function (ad) {
         if (!ad) return false;
-        render(container, apiBase, ad, format);
+        render(container, apiBase, ad, format, closeable);
         return true;
       })
       .catch(fail);
@@ -301,6 +329,7 @@
         category: n.getAttribute("data-ci-category") || "game",
         format: n.getAttribute("data-ci-format") || "card",
         country: n.getAttribute("data-ci-country") || "",
+        close: n.getAttribute("data-ci-close") !== "false",
         apiBase: n.getAttribute("data-ci-api-base") || defaultApiBase,
       });
     }
@@ -328,6 +357,7 @@
         category: script.getAttribute("data-category") || "game",
         format: script.getAttribute("data-format") || "card",
         country: script.getAttribute("data-country") || "",
+        close: script.getAttribute("data-close") !== "false",
         apiBase: apiBase,
       });
     }

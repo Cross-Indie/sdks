@@ -50,6 +50,11 @@ npm install @crossindie/web
 </script>
 ```
 
+Each banner shows a small ✕ so viewers can dismiss the slot (an icon, not a
+word — no translation needed). It's on by default; pass `close: false`
+(or `data-ci-close="false"` on an auto-init slot) to hide it. Note that a
+dismissed slot records no impression, so it earns nothing.
+
 ## Security
 
 - All credit and anti-fraud rules are enforced **server-side** (signed
