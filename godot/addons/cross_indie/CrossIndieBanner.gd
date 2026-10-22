@@ -25,12 +25,21 @@ signal clicked
 ## Banner layout. "image" = texture only; "card" = texture + title/description
 ## stacked below; "banner" = horizontal texture + text (leaderboard style).
 @export_enum("image", "card", "banner") var banner_format: String = "card"
+## Request a native-playable video banner (.ogv / Ogg Theora) and play it
+## in-engine when the network has one. Godot decodes Theora natively, so this
+## needs no plugin or platform binary; it degrades to the static image when no
+## video is available (or the backend predates native video).
+@export var enable_video: bool = true
 
 var _texture_rect: TextureRect
 var _title_label: Label
 var _desc_label: Label
 var _fetch_request: HTTPRequest
 var _image_request: HTTPRequest
+var _video_request: HTTPRequest
+var _video_player: VideoStreamPlayer
+var _video_ogv_url: String = ""
+var _pending_banner_url: String = ""
 
 var _tracking_token: String = ""
 var _target_url: String = ""
@@ -56,6 +65,10 @@ func _ready() -> void:
 	_image_request = HTTPRequest.new()
 	add_child(_image_request)
 	_image_request.request_completed.connect(_on_image_completed)
+
+	_video_request = HTTPRequest.new()
+	add_child(_video_request)
+	_video_request.request_completed.connect(_on_video_completed)
 
 	gui_input.connect(_on_gui_input)
 
@@ -122,6 +135,11 @@ func load_ad() -> void:
 	var url := "%s/api/v1/ad/fetch?app_id=%s&category=%s" % [
 		_base(), app_id.uri_encode(), category.uri_encode()
 	]
+	if enable_video:
+		# native=1 asks the network for a Godot-playable .ogv instead of the
+		# web MP4. Older backends ignore the unknown param and return no
+		# video_ogv_url, so this stays backward compatible.
+		url += "&video=1&native=1"
 	var err := _fetch_request.request(url, PackedStringArray(["Accept: application/json"]))
 	if err != OK:
 		ad_failed.emit("fetch request error %d" % err)
@@ -130,6 +148,8 @@ func load_ad() -> void:
 func _reset_state() -> void:
 	_tracking_token = ""
 	_target_url = ""
+	_video_ogv_url = ""
+	_pending_banner_url = ""
 	_impression_sent = false
 	_click_sent = false
 	_counting = false
@@ -159,6 +179,7 @@ func _on_fetch_completed(_result: int, code: int, _headers: PackedStringArray, b
 	_tracking_token = json.get("tracking_token", "")
 	_target_url = json.get("target_url", "")
 	_min_display_ms = int(json.get("min_display_ms", 1500))
+	_video_ogv_url = json.get("video_ogv_url", "")
 
 	if _title_label:
 		_title_label.text = json.get("name", "")
@@ -167,14 +188,26 @@ func _on_fetch_completed(_result: int, code: int, _headers: PackedStringArray, b
 
 	ad_loaded.emit(json.get("name", ""))
 
-	var banner_url: String = json.get("banner_image_url", "")
-	if banner_url.is_empty():
-		# No image: start the display timer immediately on the placeholder.
-		_start_display_counting()
+	_pending_banner_url = json.get("banner_image_url", "")
+	# Prefer a native video when the network served one; fall back to the
+	# static image on any failure so the slot is never left blank.
+	if enable_video and not _video_ogv_url.is_empty():
+		var verr := _video_request.request(_video_ogv_url)
+		if verr != OK:
+			_load_image_or_wait()
 	else:
-		var err := _image_request.request(banner_url)
-		if err != OK:
-			_start_display_counting()
+		_load_image_or_wait()
+
+
+## Load the static banner image, or just start the display timer if there is no
+## image to download (placeholder / video-only).
+func _load_image_or_wait() -> void:
+	if _pending_banner_url.is_empty():
+		_start_display_counting()
+		return
+	var err := _image_request.request(_pending_banner_url)
+	if err != OK:
+		_start_display_counting()
 
 
 # --------------------------------------------------------------------------- #
@@ -213,6 +246,62 @@ func _content_type(headers: PackedStringArray) -> String:
 		if h.to_lower().begins_with("content-type:"):
 			return h.to_lower()
 	return ""
+
+
+# --------------------------------------------------------------------------- #
+# Native video (Ogg Theora) playback
+# --------------------------------------------------------------------------- #
+func _on_video_completed(_result: int, code: int, _headers: PackedStringArray, body: PackedByteArray) -> void:
+	if code != 200 or body.is_empty():
+		_load_image_or_wait()  # couldn't fetch the video: fall back to image
+		return
+
+	# VideoStreamTheora loads from a file path, so persist the bytes first.
+	var path := "user://ci_ad_%d.ogv" % Time.get_ticks_usec()
+	var f := FileAccess.open(path, FileAccess.WRITE)
+	if f == null:
+		_load_image_or_wait()
+		return
+	f.store_buffer(body)
+	f.close()
+
+	var vs := VideoStreamTheora.new()
+	vs.file = path
+	_mount_video_player()
+	_video_player.stream = vs
+	_video_player.play()
+	_start_display_counting()
+
+
+## Create a VideoStreamPlayer in the texture's slot (muted, looping) and hide
+## the static TextureRect. Children ignore mouse input so clicks still reach the
+## banner's gui_input handler.
+func _mount_video_player() -> void:
+	if _video_player != null:
+		return
+	_video_player = VideoStreamPlayer.new()
+	_video_player.expand = true
+	_video_player.volume_db = -80.0  # muted banner
+	_video_player.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	# VideoStreamPlayer does not loop on its own; replay when it finishes.
+	_video_player.finished.connect(func() -> void:
+		if is_instance_valid(_video_player):
+			_video_player.play())
+
+	if _texture_rect != null and _texture_rect.get_parent() != null:
+		_video_player.custom_minimum_size = _texture_rect.custom_minimum_size
+		_video_player.size_flags_horizontal = _texture_rect.size_flags_horizontal
+		_video_player.size_flags_vertical = _texture_rect.size_flags_vertical
+		if banner_format == "image":
+			_video_player.set_anchors_preset(Control.PRESET_FULL_RECT)
+		var parent := _texture_rect.get_parent()
+		var idx := _texture_rect.get_index()
+		parent.add_child(_video_player)
+		parent.move_child(_video_player, idx)
+		_texture_rect.visible = false
+	else:
+		_video_player.set_anchors_preset(Control.PRESET_FULL_RECT)
+		add_child(_video_player)
 
 
 # --------------------------------------------------------------------------- #

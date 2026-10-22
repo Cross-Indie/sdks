@@ -32,6 +32,7 @@ func _ready() -> void:
 | `app_id`     | String | This game's app id.                           |
 | `category`   | String | Category pool to request.                     |
 | `auto_load`  | bool   | Fetch an ad automatically on `_ready`.        |
+| `enable_video` | bool | Request & play a native video banner (.ogv) when the network has one. |
 
 **Methods**
 - `load_ad()` — request a fresh ad (call manually when `auto_load` is off).
@@ -51,3 +52,12 @@ func _ready() -> void:
   reports a click.
 - All credit and fraud validation happens server-side; the addon only fetches,
   displays, and reports.
+
+## Native video banners
+
+With `enable_video` on (default), the addon asks the network for a
+native-playable **Ogg Theora** (`.ogv`) banner — Godot decodes Theora in-engine,
+so no plugin or platform binary is needed. The backend transcodes uploaded
+MP4/WebM clips to `.ogv` automatically; when a clip is available it plays muted
+and looping in the banner's media area, otherwise the slot shows the static
+image. Older backends that don't serve `.ogv` simply fall back to the image.
