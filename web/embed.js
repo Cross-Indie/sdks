@@ -209,8 +209,29 @@
     });
 
     var dwellTimer = null;
+    var inView = false;
+    function pageVisible() {
+      return !document.visibilityState || document.visibilityState === "visible";
+    }
+    function startDwell() {
+      if (!dwellTimer && !tracked && inView && pageVisible()) {
+        dwellTimer = setTimeout(reportImpression, minMs);
+      }
+    }
+    function stopDwell() {
+      if (dwellTimer) {
+        clearTimeout(dwellTimer);
+        dwellTimer = null;
+      }
+    }
+    // A background tab never counts: pause the dwell timer while hidden.
+    document.addEventListener("visibilitychange", function () {
+      if (pageVisible()) startDwell();
+      else stopDwell();
+    });
     function reportImpression() {
-      if (tracked) return;
+      dwellTimer = null;
+      if (tracked || !inView || !pageVisible()) return;
       tracked = true;
       post(apiBase, {
         tracking_token: ad.tracking_token,
@@ -229,15 +250,12 @@
               var pl = videoEl.play();
               if (pl && pl.catch) pl.catch(function () {});
             }
-            if (!dwellTimer && !tracked) {
-              dwellTimer = setTimeout(reportImpression, minMs);
-            }
+            inView = true;
+            startDwell();
           } else {
+            inView = false;
             if (videoEl && videoEl.src) videoEl.pause();
-            if (dwellTimer) {
-              clearTimeout(dwellTimer);
-              dwellTimer = null;
-            }
+            stopDwell();
           }
         });
       },
