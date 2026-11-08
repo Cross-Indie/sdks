@@ -92,8 +92,11 @@ namespace CrossIndie
 
         private IEnumerator FetchRoutine()
         {
+            // platform + package let the network confirm the SDK runs inside your store app.
             string url = $"{Base}/api/v1/ad/fetch?app_id={UnityWebRequest.EscapeURL(appId)}" +
-                         $"&category={UnityWebRequest.EscapeURL(category)}";
+                         $"&category={UnityWebRequest.EscapeURL(category)}" +
+                         $"&platform={UnityWebRequest.EscapeURL("unity-" + Application.platform.ToString().ToLowerInvariant())}" +
+                         $"&package={UnityWebRequest.EscapeURL(Application.identifier ?? "")}";
             using (var req = UnityWebRequest.Get(url))
             {
                 req.SetRequestHeader("Accept", "application/json");

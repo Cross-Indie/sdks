@@ -7,6 +7,8 @@
 #include "Serialization/JsonSerializer.h"
 #include "Misc/App.h"
 #include "GenericPlatform/GenericPlatformHttp.h"
+#include "Kismet/GameplayStatics.h"
+#include "Misc/ConfigCacheIni.h"
 
 UCrossIndieBannerComponent::UCrossIndieBannerComponent()
 {
@@ -45,11 +47,20 @@ void UCrossIndieBannerComponent::LoadAd()
     bCounting = false;
     VisibleMs = 0.f;
 
+    // platform + package let the network confirm the SDK runs inside your store app.
+    FString Package;
+#if PLATFORM_ANDROID
+    GConfig->GetString(TEXT("/Script/AndroidRuntimeSettings.AndroidRuntimeSettings"),
+                       TEXT("PackageName"), Package, GEngineIni);
+#endif
+    const FString Platform = FString(TEXT("unreal-")) + UGameplayStatics::GetPlatformName().ToLower();
     const FString Url = FString::Printf(
-        TEXT("%s/api/v1/ad/fetch?app_id=%s&category=%s"),
+        TEXT("%s/api/v1/ad/fetch?app_id=%s&category=%s&platform=%s&package=%s"),
         *BaseUrl(),
         *FGenericPlatformHttp::UrlEncode(AppId),
-        *FGenericPlatformHttp::UrlEncode(Category));
+        *FGenericPlatformHttp::UrlEncode(Category),
+        *FGenericPlatformHttp::UrlEncode(Platform),
+        *FGenericPlatformHttp::UrlEncode(Package));
 
     const TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Req =
         FHttpModule::Get().CreateRequest();

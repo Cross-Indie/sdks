@@ -132,8 +132,10 @@ func load_ad() -> void:
 		ad_failed.emit("app_id is not set")
 		return
 	_reset_state()
-	var url := "%s/api/v1/ad/fetch?app_id=%s&category=%s" % [
-		_base(), app_id.uri_encode(), category.uri_encode()
+	# platform lets the network show the owner that the SDK is connected.
+	var url := "%s/api/v1/ad/fetch?app_id=%s&category=%s&platform=%s" % [
+		_base(), app_id.uri_encode(), category.uri_encode(),
+		("godot-" + OS.get_name().to_lower()).uri_encode()
 	]
 	if enable_video:
 		# native=1 asks the network for a Godot-playable .ogv instead of the
