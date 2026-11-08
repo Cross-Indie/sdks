@@ -18,6 +18,9 @@ product and embed it freely.
 | **Godot 4.x** | [`godot/`](godot) | copy the addon into `res://addons/` |
 | **Unity** | [`unity/`](unity) | UPM: add from git URL (see below) |
 | **Unreal Engine 5** | [`unreal/`](unreal) | copy the plugin into `Plugins/` |
+| **Flutter** | [`flutter/`](flutter) | pub git dependency (`path: flutter`), pub.dev `crossindie` later |
+| **React Native / Expo** | [`react-native/`](react-native) | vendor the folder (`npx degit`), npm `@crossindie/react-native` later |
+| **Capacitor / Ionic / Cordova** | use [`web/`](web) | the web embed runs inside the app's WebView (see below) |
 
 Each folder has its own README with setup steps.
 
@@ -38,6 +41,43 @@ https://github.com/Cross-Indie/sdks.git?path=unity/com.crossindie.banner
 
 **Unreal** — copy `unreal/CrossIndie` into your project's `Plugins/` and rebuild.
 
+**Flutter** — `pubspec.yaml`:
+```yaml
+dependencies:
+  crossindie:
+    git:
+      url: https://github.com/Cross-Indie/sdks.git
+      path: flutter
+```
+```dart
+const CrossIndieBanner(appId: 'YOUR_APP_ID')
+```
+
+**React Native / Expo** (pure JS, works in Expo Go):
+```bash
+npx degit Cross-Indie/sdks/react-native vendor/crossindie-react-native
+npm install ./vendor/crossindie-react-native
+```
+```tsx
+<CrossIndieBanner appId="YOUR_APP_ID" />
+```
+
+**Capacitor / Ionic / Cordova** — no separate SDK: your app is a web page in a
+WebView, so the web embed works as-is. Add it to `index.html` (or a component
+template):
+```html
+<script src="https://api.crossindie.com/embed.js" data-api-base="https://api.crossindie.com" async></script>
+<div data-ci-app-id="YOUR_APP_ID" data-ci-category="mobile_app" data-ci-format="mobile"></div>
+```
+In single-page frameworks (Ionic Angular/React/Vue) call
+`CrossIndie.initSlots("https://api.crossindie.com")` after the slot element
+mounts. Banner links use `target="_blank"`: Capacitor opens them in the system
+browser; on Cordova keep `<allow-intent href="https://*/*" />` in `config.xml`
+(or use cordova-plugin-inappbrowser) so they leave the app. If you set
+**Allowed web domains** on the app, add `localhost` — that is the WebView's
+origin on Capacitor (`capacitor://localhost` / `https://localhost`) and
+Cordova.
+
 ## How the network works
 
 - Each banner you place is an independent **slot**. More slots means more
@@ -47,7 +87,8 @@ https://github.com/Cross-Indie/sdks.git?path=unity/com.crossindie.banner
 - Games are shown to games; web tools and SaaS share a pool.
 
 > The Unity and Unreal SDKs ship as idiomatic starters — verify against your
-> engine version. Web and Godot are production-tested.
+> engine version. Web and Godot are production-tested. Flutter and React Native
+> are new (1.0.0) and covered by unit / widget tests.
 
 ## License
 

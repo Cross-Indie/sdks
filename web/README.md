@@ -55,6 +55,27 @@ word — no translation needed). It's on by default; pass `close: false`
 (or `data-ci-close="false"` on an auto-init slot) to hide it. Note that a
 dismissed slot records no impression, so it earns nothing.
 
+## Capacitor, Ionic and Cordova apps
+
+Hybrid apps render a web page in a WebView, so this widget works there
+unchanged (no separate SDK). Put the script and a slot in `index.html`:
+
+```html
+<script src="https://api.crossindie.com/embed.js" data-api-base="https://api.crossindie.com" async></script>
+<div data-ci-app-id="YOUR_APP_ID" data-ci-category="mobile_app" data-ci-format="mobile"></div>
+```
+
+With Ionic Angular / React / Vue, call
+`CrossIndie.initSlots("https://api.crossindie.com")` after the slot element
+mounts (e.g. in `ngAfterViewInit` / `useEffect` / `onMounted`).
+
+- Clicks: banner links use `target="_blank"`. Capacitor opens them in the
+  system browser. On Cordova keep `<allow-intent href="https://*/*" />` in
+  `config.xml` (or use cordova-plugin-inappbrowser).
+- Allowed web domains: the WebView's origin is `localhost`
+  (`capacitor://localhost`, `https://localhost`, `http://localhost`), so add
+  `localhost` if you lock the app to domains, or leave the list empty.
+
 ## Security
 
 - All credit and anti-fraud rules are enforced **server-side** (signed
