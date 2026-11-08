@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="CrossIndieBannerView">
+        <!-- Your app id from Dashboard > Integration. -->
+        <attr name="ciAppId" format="string" />
+        <!-- Category pool: game | mobile_app | web_tool | saas (default game). -->
+        <attr name="ciCategory" format="string" />
+        <!-- Layout: mobile (320x50, default) | card | rectangle | leaderboard | text. -->
+        <attr name="ciFormat" format="string" />
+        <!-- Override the API base (default https://api.crossindie.com). -->
+        <attr name="ciApiBase" format="string" />
+        <!-- Rotate to a new ad this many seconds after an impression (0 = never, min 15, default 30). -->
+        <attr name="ciRefreshSeconds" format="integer" />
+        <!-- Allow muted video banners (on unmetered connections only). Default true. -->
+        <attr name="ciVideo" format="boolean" />
+        <!-- Show a small close button that hides the slot. Default false. -->
+        <attr name="ciCloseable" format="boolean" />
+        <!-- Optional viewer country (ISO-3166 alpha-2) for region targeting. -->
+        <attr name="ciCountry" format="string" />
+    </declare-styleable>
+</resources>

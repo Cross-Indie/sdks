@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#0b0a09"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/open_compose"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="12dp"
+        android:text="Open the Compose sample"
+        android:textColor="#f5f3ef" />
+
+    <!-- Classic View, configured from XML. -->
+    <com.crossindie.sdk.CrossIndieBannerView
+        android:id="@+id/banner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:ciAppId="@string/ci_app_id"
+        app:ciCategory="game"
+        app:ciFormat="mobile" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="16dp" />
+
+    <com.crossindie.sdk.CrossIndieBannerView
+        android:id="@+id/card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:ciAppId="@string/ci_app_id"
+        app:ciFormat="card"
+        app:ciCloseable="true" />
+</LinearLayout>

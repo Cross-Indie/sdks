@@ -21,3 +21,9 @@ Binaries/
 Intermediate/
 Saved/
 DerivedDataCache/
+
+# Swift / Xcode
+.build/
+.swiftpm/
+DerivedData/
+*.xcuserstate

@@ -20,6 +20,8 @@ product and embed it freely.
 | **Unreal Engine 5** | [`unreal/`](unreal) | copy the plugin into `Plugins/` |
 | **Flutter** | [`flutter/`](flutter) | pub git dependency (`path: flutter`), pub.dev `crossindie` later |
 | **React Native / Expo** | [`react-native/`](react-native) | vendor the folder (`npx degit`), npm `@crossindie/react-native` later |
+| **Android (Kotlin / Java)** | [`android/`](android) | JitPack: `com.github.Cross-Indie.sdks:crossindie:<tag>` (+ `crossindie-compose`) |
+| **iOS (Swift)** | [`ios/`](ios) | Swift Package Manager: this repo's URL |
 | **Capacitor / Ionic / Cordova** | use [`web/`](web) | the web embed runs inside the app's WebView (see below) |
 
 Each folder has its own README with setup steps.
@@ -62,6 +64,24 @@ npm install ./vendor/crossindie-react-native
 <CrossIndieBanner appId="YOUR_APP_ID" />
 ```
 
+**Android** — `settings.gradle.kts` → `maven("https://jitpack.io")`, then:
+```kotlin
+implementation("com.github.Cross-Indie.sdks:crossindie:1.2.0")          // View
+implementation("com.github.Cross-Indie.sdks:crossindie-compose:1.2.0")  // + Jetpack Compose
+```
+```xml
+<com.crossindie.sdk.CrossIndieBannerView
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    app:ciAppId="YOUR_APP_ID" />
+```
+
+**iOS** — Xcode → File → Add Package Dependencies →
+`https://github.com/Cross-Indie/sdks.git` (from `1.2.0`), then:
+```swift
+CrossIndieBanner(appId: "YOUR_APP_ID")        // SwiftUI
+CrossIndieBannerView(appId: "YOUR_APP_ID")    // UIKit
+```
+
 **Capacitor / Ionic / Cordova** — no separate SDK: your app is a web page in a
 WebView, so the web embed works as-is. Add it to `index.html` (or a component
 template):
@@ -88,7 +108,9 @@ Cordova.
 
 > The Unity and Unreal SDKs ship as idiomatic starters — verify against your
 > engine version. Web and Godot are production-tested. Flutter and React Native
-> are new (1.0.0) and covered by unit / widget tests.
+> are new (1.0.0) and covered by unit / widget tests. Android and iOS are new
+> (1.2.0), covered by unit tests and checked end-to-end on an emulator /
+> simulator.
 
 ## License
 

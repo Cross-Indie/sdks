@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Ads are fetched over the network. ACCESS_NETWORK_STATE is NOT requested:
+         if the host app already holds it, video banners are only requested on
+         unmetered connections without Data Saver; otherwise video is skipped. -->
+    <uses-permission android:name="android.permission.INTERNET" />
+</manifest>
