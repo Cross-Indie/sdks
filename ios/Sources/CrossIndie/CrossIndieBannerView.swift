@@ -437,13 +437,13 @@ open class CrossIndieBannerView: UIView {
         tapArea.addSubview(titleLabel)
         tapArea.addSubview(descLabel)
 
-        // Attribution badge: its own link to crossindie.com (never tracked as an ad click).
-        badgeButton.setTitle("PROMOTED WITH CROSSINDIE", for: .normal)
-        badgeButton.titleLabel?.font = .systemFont(ofSize: 9, weight: .medium)
+        // Ad label, always visible so the banner is never mistaken for app content.
+        // Bigger formats carry the full attribution, its own link to crossindie.com
+        // (never tracked as an ad click); the 320x50 strip gets a compact "AD" chip.
+        // Title, font and tap target are set per format in applyFormat().
+        badgeButton.accessibilityLabel = "Advertisement"
         badgeButton.setTitleColor(UIColor(red: 0xd6 / 255, green: 0xd3 / 255, blue: 0xcd / 255, alpha: 1), for: .normal)
         badgeButton.backgroundColor = UIColor(red: 10 / 255, green: 10 / 255, blue: 12 / 255, alpha: 0.72)
-        badgeButton.layer.cornerRadius = 6
-        badgeButton.contentEdgeInsets = UIEdgeInsets(top: 2, left: 6, bottom: 2, right: 6)
         badgeButton.addTarget(self, action: #selector(badgeTapped), for: .touchUpInside)
         card.addSubview(badgeButton)
 
@@ -467,7 +467,15 @@ open class CrossIndieBannerView: UIView {
         titleLabel.font = .systemFont(ofSize: small ? 13 : 14, weight: .semibold)
         descLabel.numberOfLines = format.horizontal ? 1 : 2
         mediaView.isHidden = !format.hasMedia
-        badgeButton.isHidden = !format.showsBadge
+        let full = format.showsBadge
+        badgeButton.setTitle(full ? "AD \u{00B7} PROMOTED WITH CROSSINDIE" : "AD", for: .normal)
+        badgeButton.titleLabel?.font = .systemFont(ofSize: full ? 9 : 8, weight: .medium)
+        badgeButton.layer.cornerRadius = full ? 6 : 4
+        badgeButton.contentEdgeInsets = full
+            ? UIEdgeInsets(top: 2, left: 6, bottom: 2, right: 6)
+            : UIEdgeInsets(top: 1, left: 4, bottom: 1, right: 4)
+        badgeButton.isUserInteractionEnabled = full
+        badgeButton.isHidden = false
         invalidateIntrinsicContentSize()
         setNeedsLayout()
     }
@@ -565,7 +573,8 @@ open class CrossIndieBannerView: UIView {
         descLabel.frame = CGRect(x: inner.minX, y: top + titleH + 2, width: inner.width, height: descH)
 
         let bs = badgeButton.sizeThatFits(CGSize(width: w, height: 20))
-        badgeButton.frame = CGRect(x: w - bs.width - 6, y: h - bs.height - 6, width: bs.width, height: bs.height)
+        let bm: CGFloat = format.showsBadge ? 6 : 4
+        badgeButton.frame = CGRect(x: w - bs.width - bm, y: h - bs.height - bm, width: bs.width, height: bs.height)
         closeButton.frame = CGRect(x: w - 18 - 5, y: 5, width: 18, height: 18)
         card.bringSubviewToFront(badgeButton)
         card.bringSubviewToFront(closeButton)

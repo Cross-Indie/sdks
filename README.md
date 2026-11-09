@@ -112,6 +112,24 @@ Cordova.
 > (1.2.0), covered by unit tests and checked end-to-end on an emulator /
 > simulator.
 
+## Store policy notes
+
+- **Ads are labelled.** Every banner drawn by the SDKs carries an "AD" mark
+  (the larger formats: "AD · Promoted with CrossIndie"), so it is never
+  mistaken for your own content, as Google Play and the App Store require.
+  **Unity and Unreal** give you the ad data and leave the drawing to you: put a
+  visible "Ad" / "Sponsored" label on the banner yourself.
+- **Not for apps directed at children.** CrossIndie is not on Google Play's list
+  of Families self-certified ad SDKs and is not built for COPPA / kids'
+  categories. Do not use it in apps or games that target children (Google
+  Play's Families program, the App Store Kids category).
+- **iOS privacy manifest.** The iOS SDK ships a `PrivacyInfo.xcprivacy`: no
+  tracking, no tracking domains, ad impressions/clicks not linked to the user,
+  and the one required-reason API it touches (`systemUptime`, reason `35F9.1`).
+- **No incentives for users.** Never reward your players or users for viewing
+  or tapping a banner. Credits go to you as the developer; offering them
+  rewards would break store policy.
+
 ## License
 
 MIT — see [LICENSE](LICENSE).

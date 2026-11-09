@@ -256,7 +256,7 @@ function CrossIndieBanner(props) {
                                 compact ? styles.bodyCompact : null,
                                 f.h ? styles.flex : null,
                                 f.badge && !f.horizontal ? styles.bodyBadge : null,
-                            ], children: [(0, jsx_runtime_1.jsx)(react_native_1.Text, { numberOfLines: 1, style: [styles.title, { fontSize: compact ? 13 : 14 }], children: ad.name }), f.desc && ad.description ? ((0, jsx_runtime_1.jsx)(react_native_1.Text, { numberOfLines: f.horizontal ? 1 : 2, style: styles.desc, children: ad.description })) : null] })] }), f.badge ? ((0, jsx_runtime_1.jsx)(react_native_1.Pressable, { onPress: () => open("https://crossindie.com"), style: styles.badge, accessibilityRole: "link", children: (0, jsx_runtime_1.jsx)(react_native_1.Text, { style: styles.badgeText, children: "PROMOTED WITH CROSSINDIE" }) })) : null, closeable ? ((0, jsx_runtime_1.jsx)(react_native_1.Pressable, { onPress: () => setDismissed(true), accessibilityRole: "button", accessibilityLabel: "Close", hitSlop: 8, style: styles.close, testID: "crossindie-close", children: (0, jsx_runtime_1.jsx)(react_native_1.Text, { style: styles.closeText, children: "\u00D7" }) })) : null] }));
+                            ], children: [(0, jsx_runtime_1.jsx)(react_native_1.Text, { numberOfLines: 1, style: [styles.title, { fontSize: compact ? 13 : 14 }], children: ad.name }), f.desc && ad.description ? ((0, jsx_runtime_1.jsx)(react_native_1.Text, { numberOfLines: f.horizontal ? 1 : 2, style: styles.desc, children: ad.description })) : null] })] }), f.badge ? ((0, jsx_runtime_1.jsx)(react_native_1.Pressable, { onPress: () => open("https://crossindie.com"), style: styles.badge, accessibilityRole: "link", accessibilityLabel: "Advertisement, promoted with CrossIndie", children: (0, jsx_runtime_1.jsx)(react_native_1.Text, { style: styles.badgeText, children: "AD \u00B7 PROMOTED WITH CROSSINDIE" }) })) : ((0, jsx_runtime_1.jsx)(react_native_1.View, { style: styles.adChip, pointerEvents: "none", accessibilityLabel: "Advertisement", children: (0, jsx_runtime_1.jsx)(react_native_1.Text, { style: styles.adChipText, children: "AD" }) })), closeable ? ((0, jsx_runtime_1.jsx)(react_native_1.Pressable, { onPress: () => setDismissed(true), accessibilityRole: "button", accessibilityLabel: "Close", hitSlop: 8, style: styles.close, testID: "crossindie-close", children: (0, jsx_runtime_1.jsx)(react_native_1.Text, { style: styles.closeText, children: "\u00D7" }) })) : null] }));
     }
     catch (e) {
         report(e);
@@ -277,7 +277,8 @@ const styles = react_native_1.StyleSheet.create({
     col: { flexDirection: "column" },
     flex: { flex: 1 },
     body: { justifyContent: "center", paddingHorizontal: 12, paddingVertical: 10, flexShrink: 1 },
-    bodyCompact: { paddingHorizontal: 10, paddingVertical: 6 },
+    // Right inset leaves room for the close button and the "AD" chip.
+    bodyCompact: { paddingLeft: 10, paddingRight: 26, paddingVertical: 6 },
     bodyBadge: { paddingBottom: 24 },
     title: { color: "#f5f3ef", fontWeight: "600" },
     desc: { color: "#a8a29a", fontSize: 12, marginTop: 2 },
@@ -291,6 +292,16 @@ const styles = react_native_1.StyleSheet.create({
         borderRadius: 6,
     },
     badgeText: { color: "#d6d3cd", fontSize: 9, letterSpacing: 0.9 },
+    adChip: {
+        position: "absolute",
+        right: 4,
+        bottom: 4,
+        backgroundColor: "rgba(10,10,12,0.72)",
+        paddingHorizontal: 4,
+        paddingVertical: 1,
+        borderRadius: 4,
+    },
+    adChipText: { color: "#d6d3cd", fontSize: 8, letterSpacing: 0.8 },
     close: {
         position: "absolute",
         top: 5,

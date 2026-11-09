@@ -22,7 +22,7 @@ namespace CrossIndie
     {
         [Header("Config")]
         [Tooltip("Base URL of your CrossIndie backend, e.g. https://api.crossindie.com")]
-        public string apiBase = "http://localhost:8000";
+        public string apiBase = "https://api.crossindie.com";
 
         [Tooltip("This game's app id from the CrossIndie dashboard.")]
         public string appId = "";

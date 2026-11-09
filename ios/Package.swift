@@ -10,7 +10,7 @@ let package = Package(
         .library(name: "CrossIndie", targets: ["CrossIndie"]),
     ],
     targets: [
-        .target(name: "CrossIndie", path: "Sources/CrossIndie"),
+        .target(name: "CrossIndie", path: "Sources/CrossIndie", resources: [.copy("PrivacyInfo.xcprivacy")]),
         .testTarget(name: "CrossIndieTests", dependencies: ["CrossIndie"], path: "Tests/CrossIndieTests"),
     ]
 )

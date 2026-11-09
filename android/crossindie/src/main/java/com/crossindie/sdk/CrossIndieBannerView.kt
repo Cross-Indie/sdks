@@ -441,22 +441,24 @@ class CrossIndieBannerView @JvmOverloads constructor(
         )
         card.addView(row, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
 
-        // Attribution badge: its own link to crossindie.com (never tracked as an ad click).
-        badgeView = if (f.showBadge) {
-            TextView(ctx).apply {
-                text = "PROMOTED WITH CROSSINDIE"
-                letterSpacing = 0.1f
-                setTextSize(TypedValue.COMPLEX_UNIT_SP, 9f)
-                setTextColor(BADGE_FG)
-                background = GradientDrawable().apply { setColor(OVERLAY); cornerRadius = dpf(6) }
-                setPadding(dp(6), dp(2), dp(6), dp(2))
-                setOnClickListener { openUrl("https://crossindie.com") }
-            }.also {
-                card.addView(it, LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.BOTTOM or Gravity.END).apply {
-                    setMargins(0, 0, dp(6), dp(6))
-                })
-            }
-        } else null
+        // Ad label, always visible so the banner is never mistaken for app content.
+        // Bigger formats carry the full attribution, its own link to crossindie.com
+        // (never tracked as an ad click); the 320x50 strip gets a compact "AD" chip.
+        badgeView = TextView(ctx).apply {
+            text = if (f.showBadge) "AD \u00B7 PROMOTED WITH CROSSINDIE" else "AD"
+            letterSpacing = 0.1f
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, if (f.showBadge) 9f else 8f)
+            setTextColor(BADGE_FG)
+            background = GradientDrawable().apply { setColor(OVERLAY); cornerRadius = dpf(if (f.showBadge) 6 else 4) }
+            if (f.showBadge) setPadding(dp(6), dp(2), dp(6), dp(2)) else setPadding(dp(4), dp(1), dp(4), dp(1))
+            contentDescription = "Advertisement"
+            if (f.showBadge) setOnClickListener { openUrl("https://crossindie.com") }
+        }.also {
+            val m = if (f.showBadge) dp(6) else dp(4)
+            card.addView(it, LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.BOTTOM or Gravity.END).apply {
+                setMargins(0, 0, m, m)
+            })
+        }
 
         // Small universal close button; dismissing before the dwell time records nothing.
         closeButton = TextView(ctx).apply {

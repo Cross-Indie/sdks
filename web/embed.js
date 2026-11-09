@@ -131,7 +131,8 @@
       wrap.appendChild(img);
     }
 
-    var pad = f.h && f.h <= 50 ? "6px 10px" : "10px 12px";
+    // Compact strip: right inset leaves room for the close button and the "AD" chip.
+    var pad = f.h && f.h <= 50 ? "6px 26px 6px 10px" : "10px 12px";
     var body = el(
       "div",
       "min-width:0;flex:1;display:flex;flex-direction:column;justify-content:center;padding:" + pad
@@ -157,21 +158,32 @@
     wrap.appendChild(body);
     card.appendChild(wrap);
 
-    // Attribution badge: a separate link to the CrossIndie site. A subtle pill
-    // keeps it legible wherever it overlays the card's bottom-right corner.
+    // Ad label, always visible so the banner is never mistaken for the host's
+    // content. Bigger formats carry the full attribution, a separate link to
+    // the CrossIndie site; the 320x50 strip gets a compact "Ad" chip. A subtle
+    // pill keeps it legible wherever it overlays the card's bottom-right corner.
+    var badgeCss =
+      "position:absolute;z-index:2;line-height:1.2;letter-spacing:.1em;text-transform:uppercase;" +
+      "color:#d6d3cd;background:rgba(10,10,12,.72);text-decoration:none;font-family:system-ui,sans-serif;";
     if (f.badge) {
       var badge = el(
         "a",
-        "position:absolute;right:6px;bottom:6px;z-index:2;" +
-          "font-size:9px;line-height:1.2;letter-spacing:.1em;text-transform:uppercase;" +
-          "color:#d6d3cd;background:rgba(10,10,12,.72);padding:2px 6px;border-radius:6px;" +
-          "text-decoration:none;font-family:system-ui,sans-serif",
-        "Promoted with CrossIndie"
+        badgeCss + "right:6px;bottom:6px;font-size:9px;padding:2px 6px;border-radius:6px",
+        "Ad \u00B7 Promoted with CrossIndie"
       );
       badge.href = "https://crossindie.com";
       badge.target = "_blank";
       badge.rel = "noopener noreferrer";
+      badge.setAttribute("aria-label", "Advertisement, promoted with CrossIndie");
       card.appendChild(badge);
+    } else {
+      var chip = el(
+        "span",
+        badgeCss + "right:4px;bottom:4px;font-size:8px;padding:1px 4px;border-radius:4px;pointer-events:none",
+        "Ad"
+      );
+      chip.setAttribute("aria-label", "Advertisement");
+      card.appendChild(chip);
     }
 
     // Small universal ✕ to dismiss the slot — an icon, not a word, so it needs

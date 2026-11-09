@@ -11,7 +11,7 @@ let package = Package(
         .library(name: "CrossIndie", targets: ["CrossIndie"]),
     ],
     targets: [
-        .target(name: "CrossIndie", path: "ios/Sources/CrossIndie"),
+        .target(name: "CrossIndie", path: "ios/Sources/CrossIndie", resources: [.copy("PrivacyInfo.xcprivacy")]),
         .testTarget(name: "CrossIndieTests", dependencies: ["CrossIndie"], path: "ios/Tests/CrossIndieTests"),
     ]
 )

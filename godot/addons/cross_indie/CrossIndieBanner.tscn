@@ -10,6 +10,6 @@ offset_right = 320.0
 offset_bottom = 180.0
 mouse_filter = 0
 script = ExtResource("1_banner")
-api_base = "http://localhost:8000"
+api_base = "https://api.crossindie.com"
 category = "game"
 auto_load = true

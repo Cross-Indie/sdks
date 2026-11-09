@@ -113,7 +113,12 @@ Same protocol and rules as the web, Android, Unity and Godot SDKs:
   (not expensive, not Low Data Mode), load only once the slot is visible and
   pause when it is not.
 - App Privacy label: the SDK does not track users and collects no data linked
-  to them.
+  to them (only ad impressions/clicks, unlinked: "Advertising Data", used for
+  third-party advertising and app functionality / fraud prevention).
+- Privacy manifest: `PrivacyInfo.xcprivacy` ships with the package (declares
+  the above plus `systemUptime`, reason `35F9.1`), so App Store Connect accepts
+  it without extra work.
+- Not for apps directed at children (Kids category).
 
 ## Development
 

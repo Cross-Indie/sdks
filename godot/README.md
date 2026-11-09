@@ -61,3 +61,9 @@ so no plugin or platform binary is needed. The backend transcodes uploaded
 MP4/WebM clips to `.ogv` automatically; when a clip is available it plays muted
 and looping in the banner's media area, otherwise the slot shows the static
 image. Older backends that don't serve `.ogv` simply fall back to the image.
+
+## Store policy
+
+- Every banner carries an "AD" label so it is never mistaken for your content.
+- Not for apps or games directed at children (Google Play Families program, App Store Kids category): CrossIndie is not a Families self-certified ad SDK.
+- Never reward your users for viewing or tapping a banner.

@@ -58,10 +58,9 @@ class _Spec {
 const _specs = <CrossIndieFormat, _Spec>{
   CrossIndieFormat.card: _Spec(320),
   CrossIndieFormat.rectangle: _Spec(300, h: 250, imgH: 150),
-  CrossIndieFormat.leaderboard:
-      _Spec(728, h: 90, horizontal: true, imgW: 150),
-  CrossIndieFormat.mobile: _Spec(320,
-      h: 50, horizontal: true, imgW: 50, desc: false, badge: false),
+  CrossIndieFormat.leaderboard: _Spec(728, h: 90, horizontal: true, imgW: 150),
+  CrossIndieFormat.mobile:
+      _Spec(320, h: 50, horizontal: true, imgW: 50, desc: false, badge: false),
   CrossIndieFormat.text: _Spec(320, img: false),
 };
 
@@ -451,7 +450,8 @@ class _CrossIndieBannerState extends State<CrossIndieBanner>
 
     final text = Padding(
       padding: compact
-          ? const EdgeInsets.symmetric(horizontal: 10, vertical: 6)
+          // Right inset leaves room for the close button and the "AD" chip.
+          ? const EdgeInsets.fromLTRB(10, 6, 26, 6)
           : const EdgeInsets.fromLTRB(12, 10, 12, 10),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -488,7 +488,8 @@ class _CrossIndieBannerState extends State<CrossIndieBanner>
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               if (media != null) media,
-              Expanded(child: Align(alignment: Alignment.centerLeft, child: text)),
+              Expanded(
+                  child: Align(alignment: Alignment.centerLeft, child: text)),
             ],
           )
         : Column(
@@ -520,30 +521,41 @@ class _CrossIndieBannerState extends State<CrossIndieBanner>
               child: content,
             ),
           ),
-          if (f.badge)
-            Positioned(
-              right: 6,
-              bottom: 6,
-              child: GestureDetector(
-                onTap: _openCrossIndie,
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: const Color(0xB80A0A0C),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: const Text(
-                    'PROMOTED WITH CROSSINDIE',
-                    style: TextStyle(
-                        color: Color(0xFFD6D3CD),
-                        fontSize: 9,
-                        letterSpacing: 0.9,
-                        height: 1.2),
+          // Ad label, always visible so the banner is never mistaken for app
+          // content. Bigger formats carry the full attribution, its own link
+          // to crossindie.com (never tracked as an ad click); the 320x50 strip
+          // gets a compact "AD" chip.
+          Positioned(
+            right: f.badge ? 6 : 4,
+            bottom: f.badge ? 6 : 4,
+            child: Semantics(
+              label: 'Advertisement',
+              child: IgnorePointer(
+                ignoring: !f.badge,
+                child: GestureDetector(
+                  onTap: f.badge ? _openCrossIndie : null,
+                  child: Container(
+                    padding: f.badge
+                        ? const EdgeInsets.symmetric(horizontal: 6, vertical: 2)
+                        : const EdgeInsets.symmetric(
+                            horizontal: 4, vertical: 1),
+                    decoration: BoxDecoration(
+                      color: const Color(0xB80A0A0C),
+                      borderRadius: BorderRadius.circular(f.badge ? 6 : 4),
+                    ),
+                    child: Text(
+                      f.badge ? 'AD \u00B7 PROMOTED WITH CROSSINDIE' : 'AD',
+                      style: TextStyle(
+                          color: const Color(0xFFD6D3CD),
+                          fontSize: f.badge ? 9 : 8,
+                          letterSpacing: 0.9,
+                          height: 1.2),
+                    ),
                   ),
                 ),
               ),
             ),
+          ),
           if (widget.closeable)
             Positioned(
               top: 5,

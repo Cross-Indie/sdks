@@ -31,7 +31,7 @@ public:
 
     /** Base URL of your CrossIndie backend, e.g. https://api.crossindie.com */
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CrossIndie")
-    FString ApiBase = TEXT("http://localhost:8000");
+    FString ApiBase = TEXT("https://api.crossindie.com");
 
     /** This game's app id from the CrossIndie dashboard. */
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CrossIndie")

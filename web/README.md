@@ -86,3 +86,9 @@ mounts (e.g. in `ngAfterViewInit` / `useEffect` / `onMounted`).
   cannot be used to farm impressions from another site.
 - An impression is only reported after the banner is continuously visible in
   the viewport for the server-mandated minimum (>=1.5s).
+
+## Store policy
+
+- Every banner carries an "AD" label so it is never mistaken for your content.
+- Not for apps or games directed at children (Google Play Families program, App Store Kids category): CrossIndie is not a Families self-certified ad SDK.
+- Never reward your users for viewing or tapping a banner.

@@ -109,3 +109,9 @@ npm run build     # tsc -> lib/
 ## License
 
 MIT
+
+## Store policy
+
+- Every banner carries an "AD" label so it is never mistaken for your content.
+- Not for apps or games directed at children (Google Play Families program, App Store Kids category): CrossIndie is not a Families self-certified ad SDK.
+- Never reward your users for viewing or tapping a banner.

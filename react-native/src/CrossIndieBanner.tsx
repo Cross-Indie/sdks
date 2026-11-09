@@ -368,11 +368,23 @@ export function CrossIndieBanner(props: CrossIndieBannerProps) {
             ) : null}
           </View>
         </Pressable>
+        {/* Ad label, always visible so the banner is never mistaken for app content.
+            Bigger formats carry the full attribution, its own link to crossindie.com
+            (never tracked as an ad click); the 320x50 strip gets a compact "AD" chip. */}
         {f.badge ? (
-          <Pressable onPress={() => open("https://crossindie.com")} style={styles.badge} accessibilityRole="link">
-            <Text style={styles.badgeText}>PROMOTED WITH CROSSINDIE</Text>
+          <Pressable
+            onPress={() => open("https://crossindie.com")}
+            style={styles.badge}
+            accessibilityRole="link"
+            accessibilityLabel="Advertisement, promoted with CrossIndie"
+          >
+            <Text style={styles.badgeText}>AD · PROMOTED WITH CROSSINDIE</Text>
           </Pressable>
-        ) : null}
+        ) : (
+          <View style={styles.adChip} pointerEvents="none" accessibilityLabel="Advertisement">
+            <Text style={styles.adChipText}>AD</Text>
+          </View>
+        )}
         {closeable ? (
           <Pressable
             onPress={() => setDismissed(true)}
@@ -407,7 +419,8 @@ const styles = StyleSheet.create({
   col: { flexDirection: "column" },
   flex: { flex: 1 },
   body: { justifyContent: "center", paddingHorizontal: 12, paddingVertical: 10, flexShrink: 1 },
-  bodyCompact: { paddingHorizontal: 10, paddingVertical: 6 },
+  // Right inset leaves room for the close button and the "AD" chip.
+  bodyCompact: { paddingLeft: 10, paddingRight: 26, paddingVertical: 6 },
   bodyBadge: { paddingBottom: 24 },
   title: { color: "#f5f3ef", fontWeight: "600" },
   desc: { color: "#a8a29a", fontSize: 12, marginTop: 2 },
@@ -421,6 +434,16 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   badgeText: { color: "#d6d3cd", fontSize: 9, letterSpacing: 0.9 },
+  adChip: {
+    position: "absolute",
+    right: 4,
+    bottom: 4,
+    backgroundColor: "rgba(10,10,12,0.72)",
+    paddingHorizontal: 4,
+    paddingVertical: 1,
+    borderRadius: 4,
+  },
+  adChipText: { color: "#d6d3cd", fontSize: 8, letterSpacing: 0.8 },
   close: {
     position: "absolute",
     top: 5,

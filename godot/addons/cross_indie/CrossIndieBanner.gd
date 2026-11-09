@@ -15,7 +15,7 @@ signal impression_tracked
 signal clicked
 
 ## Base URL of your CrossIndie backend, e.g. "https://api.crossindie.com".
-@export var api_base: String = "http://localhost:8000"
+@export var api_base: String = "https://api.crossindie.com"
 ## The app_id of THIS game (from your CrossIndie dashboard).
 @export var app_id: String = ""
 ## Category pool to request. Games only ever match games.
@@ -88,6 +88,7 @@ func _build_layout() -> void:
 		custom_minimum_size = Vector2(320, 180)
 		_texture_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
 		add_child(_texture_rect)
+		_add_ad_label()
 		return
 
 	_title_label = Label.new()
@@ -124,6 +125,34 @@ func _build_layout() -> void:
 	root_box.add_child(_texture_rect)
 	root_box.add_child(text_box)
 	add_child(root_box)
+	_add_ad_label()
+
+
+## Small "AD" pill in the bottom-right corner, always visible so the banner is
+## never mistaken for game content. Drawn above the image and video (z_index)
+## and ignores the mouse, so clicks still reach the banner.
+func _add_ad_label() -> void:
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0.04, 0.04, 0.05, 0.72)
+	style.set_corner_radius_all(4)
+	style.content_margin_left = 5
+	style.content_margin_right = 5
+	style.content_margin_top = 1
+	style.content_margin_bottom = 1
+	var pill := PanelContainer.new()
+	pill.add_theme_stylebox_override("panel", style)
+	pill.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	pill.z_index = 1
+	var label := Label.new()
+	label.text = "AD"
+	label.add_theme_font_size_override("font_size", 10)
+	label.add_theme_color_override("font_color", Color(0.84, 0.83, 0.80))
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	pill.add_child(label)
+	add_child(pill)
+	pill.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	pill.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	pill.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT, Control.PRESET_MODE_MINSIZE, 6)
 
 
 ## Request a new ad from the network.
