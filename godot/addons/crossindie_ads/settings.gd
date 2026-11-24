@@ -37,7 +37,7 @@ const DEFINITIONS: Array = [
 	["crossindie_category", "crossindie/category", "game", TYPE_STRING, PROPERTY_HINT_ENUM, "game,web_tool,saas,mobile_app"],
 	["fallback_close_delay_sec", "crossindie/fallback_close_delay_sec", 3.0, TYPE_FLOAT, PROPERTY_HINT_RANGE, "0,30,0.5"],
 	["fallback_reward_delay_sec", "crossindie/fallback_reward_delay_sec", 5.0, TYPE_FLOAT, PROPERTY_HINT_RANGE, "1.5,60,0.5"],
-	["rewarded_fallback_grants_reward", "crossindie/rewarded_fallback_grants_reward", true, TYPE_BOOL, PROPERTY_HINT_NONE, ""],
+	["rewarded_fallback_grants_reward", "crossindie/rewarded_fallback_grants_reward", false, TYPE_BOOL, PROPERTY_HINT_NONE, ""],
 	["fallback_reward_amount", "crossindie/fallback_reward_amount", 1, TYPE_INT, PROPERTY_HINT_NONE, ""],
 	["fallback_reward_type", "crossindie/fallback_reward_type", "reward", TYPE_STRING, PROPERTY_HINT_NONE, ""],
 	["crossindie_banner_refresh_sec", "crossindie/banner_refresh_sec", 60.0, TYPE_FLOAT, PROPERTY_HINT_RANGE, "0,600,1"],

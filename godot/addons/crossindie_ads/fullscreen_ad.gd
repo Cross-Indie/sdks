@@ -24,7 +24,7 @@ const LAYER := 128
 var rewarded: bool = false
 var close_delay_sec: float = 3.0
 var reward_delay_sec: float = 5.0
-var grant_reward: bool = true
+var grant_reward: bool = false
 var reward_amount: int = 1
 var reward_type: String = "reward"
 

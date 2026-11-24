@@ -61,7 +61,7 @@ Project Settings → `crossindie_ads/…` (or pass the same keys to `initialize(
 | `crossindie/category` | `crossindie_category` | `game` | |
 | `crossindie/fallback_close_delay_sec` | `fallback_close_delay_sec` | `3` | Interstitial fallback close button delay. |
 | `crossindie/fallback_reward_delay_sec` | `fallback_reward_delay_sec` | `5` | Rewarded fallback visible time before reward (≥ 1.5). |
-| `crossindie/rewarded_fallback_grants_reward` | `rewarded_fallback_grants_reward` | `true` | See "Fallback behavior". |
+| `crossindie/rewarded_fallback_grants_reward` | `rewarded_fallback_grants_reward` | `false` | See "Fallback behavior". |
 | `crossindie/fallback_reward_amount` / `_type` | `fallback_reward_amount` / `fallback_reward_type` | `1` / `"reward"` | Reward reported by the fallback. |
 | `crossindie/banner_refresh_sec` | `crossindie_banner_refresh_sec` | `60` | 0 = never refresh. |
 | `android/play_services_ads_version` | – | `""` (auto) | Maven version pulled at export. |
@@ -122,7 +122,7 @@ on the Android UI thread and come back to GDScript on Godot's main thread.
 |---|---|
 | Banner | Full-width CrossIndie strip (CanvasLayer 100) at the same edge. Refreshes every `banner_refresh_sec`. Every `banner_retry_sec` AdMob is tried again; on fill it replaces the fallback. |
 | Interstitial | Full-screen overlay (CanvasLayer 128, blocks game input, works while the tree is paused) with a CrossIndie ad; the close button appears after `fallback_close_delay_sec`. |
-| Rewarded | Same overlay. If `rewarded_fallback_grants_reward` is **on (default)** `rewarded_earned(fallback_reward_amount, fallback_reward_type)` fires after the ad has been visible for `fallback_reward_delay_sec` **with the window focused**, then the close button appears. If **off**, it behaves like an interstitial and never rewards. |
+| Rewarded | Same overlay. If `rewarded_fallback_grants_reward` is **on** `rewarded_earned(fallback_reward_amount, fallback_reward_type)` fires after the ad has been visible for `fallback_reward_delay_sec` **with the window focused**, then the close button appears. If **off (default)**, it behaves like an interstitial and never rewards: a rewarded call that closes without `rewarded_earned` means "no reward". |
 
 Impressions/clicks for fallback ads go through the unmodified
 `CrossIndieBanner`: `GET /api/v1/ad/fetch` → signed `tracking_token` →
@@ -130,10 +130,10 @@ Impressions/clicks for fallback ads go through the unmodified
 focused only) and on click. Ads are preloaded hidden, so preloading never
 counts as an impression.
 
-Note: the CrossIndie network policy for plain banners is "never reward users
-for viewing or tapping". Rewarded fallback impressions are therefore
-incentivized; turn `rewarded_fallback_grants_reward` off if your CrossIndie
-terms or your own policy don't allow incentivized cross-promo.
+Note: the CrossIndie network policy is "never reward users for viewing or
+tapping a CrossIndie ad" (advertisers pay credits for genuine attention). That
+is why the rewarded fallback does **not** grant a reward by default. Only turn
+`rewarded_fallback_grants_reward` on for house ads between your own apps.
 
 The CrossIndie overlay does not pause your game. Use `interstitial_opened` /
 `interstitial_closed` (and the rewarded pair) to pause/resume if needed. AdMob

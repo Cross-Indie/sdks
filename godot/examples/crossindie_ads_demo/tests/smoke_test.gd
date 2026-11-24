@@ -33,6 +33,7 @@ func _ready() -> void:
 		"crossindie_base_url": BASE,
 		"fallback_close_delay_sec": 1.0,
 		"fallback_reward_delay_sec": 2.0,
+		"rewarded_fallback_grants_reward": true,  # exercise the reward path (default is off)
 	})
 	get_tree().create_timer(30.0).timeout.connect(func() -> void: _finish("timeout"))
 

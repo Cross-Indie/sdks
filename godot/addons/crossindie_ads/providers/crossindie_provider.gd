@@ -188,7 +188,7 @@ func _load_fullscreen(format: String) -> void:
 	ad.set("rewarded", format == REWARDED)
 	ad.set("close_delay_sec", float(config.get("fallback_close_delay_sec", 3.0)))
 	ad.set("reward_delay_sec", float(config.get("fallback_reward_delay_sec", 5.0)))
-	ad.set("grant_reward", bool(config.get("rewarded_fallback_grants_reward", true)))
+	ad.set("grant_reward", bool(config.get("rewarded_fallback_grants_reward", false)))
 	ad.set("reward_amount", int(config.get("fallback_reward_amount", 1)))
 	ad.set("reward_type", String(config.get("fallback_reward_type", "reward")))
 	_fullscreen[format] = ad
