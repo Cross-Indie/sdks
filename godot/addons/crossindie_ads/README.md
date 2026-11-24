@@ -20,6 +20,11 @@ desktop, iOS for now).
 | 4.3 – 4.4 | AGP 8.2, compileSdk 34, minSdk 21 | 23.6.0 |
 | 4.5+ (tested up to 4.7.2) | AGP 8.6+, compileSdk 35+, minSdk 24 | 25.5.0 |
 
+Verified end to end with Godot 4.7.2 on an Android 16 (API 36) arm64 emulator and a
+physical Samsung Galaxy M10 (Android 10, 32-bit armeabi-v7a): adaptive banner,
+interstitial and rewarded (Google test units) load, show, close and reward.
+4.2 – 4.6 are build-verified (AAR compiles against each template's SDK levels).
+
 Override with Project Settings → `crossindie_ads/android/play_services_ads_version`.
 The bridge AAR is built against Godot 4.2.0 + play-services-ads 22.6.0 and
 also compiles cleanly against 4.5 + 24.9.0 and 4.7.2 + 25.5.0.
