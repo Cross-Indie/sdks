@@ -1,0 +1,59 @@
+plugins {
+    id "com.android.library"
+}
+
+def addonBinDir = file("../../addons/crossindie_ads/bin")
+
+android {
+    namespace "com.crossindie.ads.godot"
+    compileSdk 35
+
+    defaultConfig {
+        // Godot 4.2-4.4 templates default to minSdk 21; 4.5+ to 24.
+        minSdk 21
+        consumerProguardFiles "consumer-rules.pro"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+    }
+
+    compileOptions {
+        // Java 11 bytecode is accepted by every Godot 4.2+ Gradle template
+        // (4.2 ships AGP 7.2 / D8). Plain Java = no Kotlin stdlib clashes.
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+
+    buildFeatures {
+        buildConfig false
+    }
+}
+
+dependencies {
+    // Provided by the Godot app at runtime; never bundled into the AAR.
+    compileOnly "org.godotengine:godot:${project.property('godotVersion')}"
+    // Pulled by the Godot export from Maven (EditorExportPlugin
+    // _get_android_dependencies), so the AAR itself stays SDK-free.
+    // UMP (consent) comes transitively with play-services-ads.
+    compileOnly "com.google.android.gms:play-services-ads:${project.property('gmaVersion')}"
+}
+
+// Copy the built AARs into the Godot addon so `./gradlew assemble` is all a
+// maintainer has to run.
+def copyAar = { String variant ->
+    tasks.register("copy${variant.capitalize()}AarToAddon", Copy) {
+        from(layout.buildDirectory.file("outputs/aar/plugin-${variant}.aar"))
+        into(new File(addonBinDir, variant))
+        rename { "crossindie-ads-${variant}.aar" }
+    }
+}
+copyAar("debug")
+copyAar("release")
+
+afterEvaluate {
+    tasks.named("assembleDebug").configure { finalizedBy("copyDebugAarToAddon") }
+    tasks.named("assembleRelease").configure { finalizedBy("copyReleaseAarToAddon") }
+}

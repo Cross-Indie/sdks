@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application>
+        <!-- Godot Android plugin v2 registration: name after the prefix must
+             match CrossIndieAdsPlugin.getPluginName(). -->
+        <meta-data
+            android:name="org.godotengine.plugin.v2.CrossIndieAdsAndroid"
+            android:value="com.crossindie.ads.godot.CrossIndieAdsPlugin" />
+    </application>
+
+</manifest>

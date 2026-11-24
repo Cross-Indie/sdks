@@ -1,0 +1,35 @@
+; Engine configuration file.
+; Demo for the CrossIndie Ads addon. addons/ are symlinks into ../../addons.
+
+config_version=5
+
+[application]
+
+config/name="CrossIndie Ads Demo"
+run/main_scene="res://main.tscn"
+config/features=PackedStringArray("4.2", "Mobile")
+
+[autoload]
+
+CrossIndieAds="*res://addons/crossindie_ads/crossindie_ads.gd"
+
+[crossindie_ads]
+
+general/test_mode=true
+crossindie/app_id=""
+
+[display]
+
+window/size/viewport_width=720
+window/size/viewport_height=1280
+window/stretch/mode="canvas_items"
+window/handheld/orientation=1
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/cross_indie/plugin.cfg", "res://addons/crossindie_ads/plugin.cfg")
+
+[rendering]
+
+renderer/rendering_method="mobile"
+textures/vram_compression/import_etc2_astc=true

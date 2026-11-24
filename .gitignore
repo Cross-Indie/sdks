@@ -27,3 +27,7 @@ DerivedDataCache/
 .swiftpm/
 DerivedData/
 *.xcuserstate
+
+# Godot 4.4+ writes these when the demo project (which symlinks the addons) is opened
+godot/addons/**/*.uid
+godot/addons/**/*.import

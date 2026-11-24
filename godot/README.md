@@ -67,3 +67,9 @@ image. Older backends that don't serve `.ogv` simply fall back to the image.
 - Every banner carries an "AD" label so it is never mistaken for your content.
 - Not for apps or games directed at children (Google Play Families program, App Store Kids category): CrossIndie is not a Families self-certified ad SDK.
 - Never reward your users for viewing or tapping a banner.
+
+## Ads (AdMob + CrossIndie fallback)
+
+For banner / interstitial / rewarded ads with Google AdMob on Android and
+automatic CrossIndie fallback, see [`addons/crossindie_ads`](addons/crossindie_ads/README.md).
+It composes this banner and needs this addon installed next to it.

@@ -16,6 +16,7 @@ product and embed it freely.
 |----------|------|--------------|
 | **Web** | [`web/`](web) | npm `@crossindie/web`, or `<script src=".../embed.js">` |
 | **Godot 4.x** | [`godot/`](godot) | copy the addon into `res://addons/` |
+| **Godot 4.2+ Ads** (AdMob + CrossIndie fallback) | [`godot/addons/crossindie_ads`](godot/addons/crossindie_ads) | copy `crossindie_ads` + `cross_indie` into `res://addons/` |
 | **Unity** | [`unity/`](unity) | UPM: add from git URL (see below) |
 | **Unreal Engine 5** | [`unreal/`](unreal) | copy the plugin into `Plugins/` |
 | **Flutter** | [`flutter/`](flutter) | pub git dependency (`path: flutter`), pub.dev `crossindie` later |
@@ -40,6 +41,13 @@ https://github.com/Cross-Indie/sdks.git?path=unity/com.crossindie.banner
 ```
 
 **Godot** — copy `godot/addons/cross_indie` into `res://addons/` and enable the plugin.
+
+**Godot Ads (CrossIndie Ads)** — banner / interstitial / rewarded with Google
+AdMob on Android and automatic CrossIndie fallback on no-fill (and on desktop /
+iOS). Copy `godot/addons/crossindie_ads` and `godot/addons/cross_indie`, enable
+both plugins, turn on Gradle build in the Android preset, then
+`CrossIndieAds.initialize({...})`. See
+[`godot/addons/crossindie_ads/README.md`](godot/addons/crossindie_ads/README.md).
 
 **Unreal** — copy `unreal/CrossIndie` into your project's `Plugins/` and rebuild.
 
