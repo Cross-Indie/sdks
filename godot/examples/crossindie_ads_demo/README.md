@@ -22,6 +22,7 @@ The preset already enables Gradle build, arm64 and INTERNET.
 python3 -I tests/mock_server.py 8765 &           # fake CrossIndie API
 godot --headless --path . res://tests/smoke_test.tscn            # fill path
 godot --headless --path . res://tests/smoke_test.tscn -- --nofill  # no-fill path
+godot --headless --path . res://tests/share_test.tscn            # crossindie_share / prefer
 ```
 
-Both print `[smoke] PASS` and exit 0 on success.
+All print `PASS` and exit 0 on success.

@@ -11,6 +11,25 @@ desktop, iOS for now).
   jars, and the native bridge is a ~15 KB AAR compiled against the oldest
   supported APIs. That is what keeps it from breaking on engine upgrades.
 - GDPR / US-state consent via Google UMP is built in.
+- **CrossIndie share (optional):** send a share of your banners/interstitials
+  to the CrossIndie network on purpose and earn credits that promote *your*
+  game in other indie games. Off by default. See below.
+
+## Why the CrossIndie part?
+
+[CrossIndie](https://crossindie.com) is a free cross-promotion network for
+indie games and apps: every CrossIndie ad shown in your game earns you
+credits, and credits buy impressions for your own game in other games. No
+money changes hands.
+
+Out of the box it only fills slots AdMob leaves empty, and that happens more
+than you would think: new AdMob accounts on "limited ad serving" for weeks,
+players who decline consent, low-fill countries, ad blockers, iOS/desktop
+builds. An empty slot earns nothing; a CrossIndie ad there earns you players.
+
+Sign up at [crossindie.com](https://crossindie.com), add your game, and paste
+its app id into `crossindie_ads/crossindie/app_id`. Without an app id the
+addon is a plain AdMob plugin.
 
 ## Supported versions
 
@@ -30,6 +49,11 @@ The bridge AAR is built against Godot 4.2.0 + play-services-ads 22.6.0 and
 also compiles cleanly against 4.5 + 24.9.0 and 4.7.2 + 25.5.0.
 
 ## Install
+
+Download `crossindie-ads-<version>.zip` from the
+[latest release](https://github.com/Cross-Indie/godot-admob/releases/latest)
+(or clone [Cross-Indie/godot-admob](https://github.com/Cross-Indie/godot-admob);
+the repo itself is the demo project).
 
 1. Copy **both** `addons/crossindie_ads/` and `addons/cross_indie/` into your
    project's `res://addons/` (the fallback reuses the stock `CrossIndieBanner`).
@@ -64,6 +88,7 @@ Project Settings → `crossindie_ads/…` (or pass the same keys to `initialize(
 | `crossindie/app_id` | `crossindie_app_id` | `""` | Your CrossIndie app id (dashboard). |
 | `crossindie/base_url` | `crossindie_base_url` | `https://api.crossindie.com` | |
 | `crossindie/category` | `crossindie_category` | `game` | |
+| `crossindie/share_percent` | `crossindie_share` | `0` | % of banners/interstitials sent to CrossIndie first. See "CrossIndie share". |
 | `crossindie/fallback_close_delay_sec` | `fallback_close_delay_sec` | `3` | Interstitial fallback close button delay. |
 | `crossindie/fallback_reward_delay_sec` | `fallback_reward_delay_sec` | `5` | Rewarded fallback visible time before reward (≥ 1.5). |
 | `crossindie/rewarded_fallback_grants_reward` | `rewarded_fallback_grants_reward` | `false` | See "Fallback behavior". |
@@ -103,10 +128,10 @@ func _on_reward(amount: int, type: String) -> void:
 | Method | |
 |---|---|
 | `initialize(config := {})` | Merge config over Project Settings and start providers. |
-| `show_banner(position := "bottom")` / `hide_banner()` / `destroy_banner()` | `"top"` or `"bottom"`. |
+| `show_banner(position := "bottom", prefer := "")` / `hide_banner()` / `destroy_banner()` | `"top"` or `"bottom"`. `prefer`: see "CrossIndie share". |
 | `is_banner_visible()`, `get_banner_height_px()` | Physical pixels, for pushing UI out of the way. |
-| `load_interstitial()`, `is_interstitial_ready()`, `show_interstitial() -> bool` | |
-| `load_rewarded()`, `is_rewarded_ready()`, `show_rewarded() -> bool` | |
+| `load_interstitial(prefer := "")`, `is_interstitial_ready()`, `show_interstitial() -> bool` | |
+| `load_rewarded(prefer := "")`, `is_rewarded_ready()`, `show_rewarded() -> bool` | |
 | `is_privacy_options_required()`, `show_privacy_options()` | GDPR "Privacy settings" button. |
 | `get_active_providers()`, `is_test_mode()`, `is_initialized()` | |
 
@@ -144,6 +169,40 @@ The CrossIndie overlay does not pause your game. Use `interstitial_opened` /
 `interstitial_closed` (and the rewarded pair) to pause/resume if needed. AdMob
 full-screen ads pause the Godot activity themselves.
 
+## CrossIndie share
+
+By default CrossIndie only gets the slots AdMob cannot fill. If you want more
+players for your own game, give the network a share on purpose:
+
+```gdscript
+CrossIndieAds.initialize({"crossindie_app_id": "...", "crossindie_share": 10})
+```
+
+- `crossindie_share` = 10 → about 1 in 10 banners and interstitials go to
+  CrossIndie first, without asking AdMob. If CrossIndie has nothing to show,
+  the normal chain (AdMob) is used, so the slot never goes empty.
+- Interstitials roll on every load (also on each auto reload). Banners roll
+  when a banner is created (`show_banner` after `destroy_banner` or a position
+  change); a shared banner stays on CrossIndie and is not swapped back to AdMob.
+- **Rewarded ads are never shared.** The CrossIndie rewarded fallback gives no
+  reward by default, so sharing it would cost your players their reward.
+
+Or decide per placement with `prefer` (overrides the share):
+
+```gdscript
+CrossIndieAds.show_banner("bottom", "crossindie")  # main menu: always CrossIndie first
+CrossIndieAds.load_interstitial("admob")           # level end: never shared
+```
+
+The trade: a shared slot earns credits instead of AdMob revenue. Credits buy
+impressions for your game across the network, so a 5–10 % share is a cheap
+way to get installs while your game is small. Your credit balance and how
+your own ad performs (Hit Radar) are in the CrossIndie dashboard.
+
+You can also put your own network adapter in the chain by path:
+`"provider_chain": "res://my_network_provider.gd,admob,crossindie"` (extend
+`providers/ad_provider.gd`).
+
 ## Platforms
 
 | | Banner | Interstitial | Rewarded |
@@ -160,8 +219,9 @@ full-screen ads pause the Godot activity themselves.
 - **AppLovin MAX** (Android + iOS): second bridge `CrossIndieAdsMax`, SDK pulled
   from Maven/CocoaPods, enabled by adding `applovin_max` to `provider_chain`.
   Stub: `providers/applovin_max_provider.gd`.
-- Adding a network = extend `providers/ad_provider.gd` and register it in
-  `crossindie_ads.gd::_provider_script_path()`.
+- Adding a network = extend `providers/ad_provider.gd` and either register it
+  in `crossindie_ads.gd::_provider_script_path()` or list its `res://` path in
+  `provider_chain`.
 
 ## Rebuilding the Android bridge
 

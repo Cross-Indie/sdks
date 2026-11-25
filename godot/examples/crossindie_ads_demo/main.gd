@@ -20,6 +20,9 @@ func _ready() -> void:
 
 	_add_button(box, "Banner top", func() -> void: CrossIndieAds.show_banner("top"))
 	_add_button(box, "Banner bottom", func() -> void: CrossIndieAds.show_banner("bottom"))
+	_add_button(box, "Banner bottom (CrossIndie first)", func() -> void:
+		CrossIndieAds.destroy_banner()
+		CrossIndieAds.show_banner("bottom", "crossindie"))
 	_add_button(box, "Hide banner", func() -> void: CrossIndieAds.hide_banner())
 	_add_button(box, "Load interstitial", func() -> void: CrossIndieAds.load_interstitial())
 	_add_button(box, "Show interstitial", func() -> void: CrossIndieAds.show_interstitial())

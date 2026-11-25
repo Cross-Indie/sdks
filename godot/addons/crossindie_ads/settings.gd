@@ -34,6 +34,9 @@ const DEFINITIONS: Array = [
 
 	["crossindie_app_id", "crossindie/app_id", "", TYPE_STRING, PROPERTY_HINT_NONE, ""],
 	["crossindie_base_url", "crossindie/base_url", "https://api.crossindie.com", TYPE_STRING, PROPERTY_HINT_NONE, ""],
+	## % of banners/interstitials that go to CrossIndie first (AdMob is not asked).
+	## Each one earns you network credits. Rewarded ads are never shared.
+	["crossindie_share", "crossindie/share_percent", 0, TYPE_INT, PROPERTY_HINT_RANGE, "0,100,1"],
 	["crossindie_category", "crossindie/category", "game", TYPE_STRING, PROPERTY_HINT_ENUM, "game,web_tool,saas,mobile_app"],
 	["fallback_close_delay_sec", "crossindie/fallback_close_delay_sec", 3.0, TYPE_FLOAT, PROPERTY_HINT_RANGE, "0,30,0.5"],
 	["fallback_reward_delay_sec", "crossindie/fallback_reward_delay_sec", 5.0, TYPE_FLOAT, PROPERTY_HINT_RANGE, "1.5,60,0.5"],

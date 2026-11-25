@@ -15,6 +15,12 @@ extends Node
 ## In every signal `provider` is the network that served the event ("admob",
 ## "crossindie", ...). `ad_failed` with provider == "" means the whole chain
 ## failed for that request.
+##
+## CrossIndie share: `crossindie_share` (0-100 %) sends that share of banners
+## and interstitials to CrossIndie first, so they earn network credits; AdMob
+## is used when CrossIndie has no fill. Per placement, pass prefer:
+##   CrossIndieAds.show_banner("bottom", "crossindie")  # always CrossIndie first
+##   CrossIndieAds.load_interstitial("admob")           # never shared
 
 signal initialized
 signal consent_finished(can_request_ads: bool)
@@ -36,7 +42,8 @@ signal ad_failed(format: String, provider: String, error: String)
 const BANNER := "banner"
 const INTERSTITIAL := "interstitial"
 const REWARDED := "rewarded"
-const VERSION := "0.1.0"
+const VERSION := "0.2.0"
+const CROSSINDIE := "crossindie"
 
 const Settings := preload("res://addons/crossindie_ads/settings.gd")
 const ProviderBase := preload("res://addons/crossindie_ads/providers/ad_provider.gd")
@@ -52,10 +59,17 @@ var _banner_top: bool = false
 var _banner_attempt: int = -1
 var _banner_active: int = -1
 var _banner_timer: Timer = null
+## The banner on screen came from a CrossIndie share turn: no AdMob upgrade.
+var _banner_house: bool = false
 
 # Fullscreen state per format: index currently loading (-1 = idle).
 var _fs_attempt: Dictionary = {INTERSTITIAL: -1, REWARDED: -1}
 var _fs_showing: Dictionary = {INTERSTITIAL: null, REWARDED: null}
+# Provider indices to try, in order, for the current load.
+var _fs_order: Dictionary = {INTERSTITIAL: [], REWARDED: []}
+# Shown before anything else when ready (set on a CrossIndie share turn).
+var _fs_preferred: Dictionary = {INTERSTITIAL: null, REWARDED: null}
+var _rng := RandomNumberGenerator.new()
 
 
 # --------------------------------------------------------------------------- #
@@ -73,6 +87,7 @@ func initialize(config: Dictionary = {}) -> void:
 	for k in config:
 		_config[k] = config[k]
 	_initialized = true
+	_rng.randomize()
 
 	_banner_timer = Timer.new()
 	_banner_timer.one_shot = true
@@ -113,6 +128,8 @@ func initialize(config: Dictionary = {}) -> void:
 
 ## Script for a provider id. Add new networks here.
 func _provider_script_path(provider_id: String) -> String:
+	if provider_id.begins_with("res://"):
+		return provider_id  # your own adapter extending providers/ad_provider.gd
 	match provider_id:
 		"admob":
 			if OS.get_name() == "iOS":
@@ -165,6 +182,28 @@ func _require_init(format: String) -> bool:
 	return false
 
 
+## Index of the CrossIndie provider for `format` (-1 if it is not in the chain).
+func _crossindie_index(format: String) -> int:
+	for i in _providers.size():
+		if _providers[i].provider_name() == CROSSINDIE and _providers[i].supports(format):
+			return i
+	return -1
+
+
+## Whether this request goes to CrossIndie before the rest of the chain.
+## prefer: "" = roll crossindie_share, "crossindie" = yes, any other id = no.
+## Rewarded ads only on an explicit "crossindie" (the fallback has no reward).
+func _house_turn(format: String, prefer: String) -> bool:
+	if _crossindie_index(format) <= 0:
+		return false  # not in the chain, or already first
+	if prefer == CROSSINDIE:
+		return true
+	if not prefer.is_empty() or format == REWARDED:
+		return false
+	var share: int = clampi(int(_config.get("crossindie_share", 0)), 0, 100)
+	return share > 0 and _rng.randi_range(1, 100) <= share
+
+
 func _next_supporting(format: String, from: int, before: int = -1) -> int:
 	var end: int = _providers.size() if before < 0 else mini(before, _providers.size())
 	for i in range(from, end):
@@ -179,7 +218,9 @@ func _next_supporting(format: String, from: int, before: int = -1) -> int:
 
 ## Show a banner anchored to "top" or "bottom". Loads if needed; falls back
 ## down the chain on no-fill and periodically retries better providers.
-func show_banner(position: String = "bottom") -> void:
+## prefer: "" = crossindie_share decides, "crossindie" = CrossIndie first,
+## "admob" (any other id) = normal chain. Decided when the banner is created.
+func show_banner(position: String = "bottom", prefer: String = "") -> void:
 	if not _require_init(BANNER):
 		return
 	var top: bool = position.to_lower() == "top"
@@ -190,7 +231,8 @@ func show_banner(position: String = "bottom") -> void:
 	if _banner_active >= 0 or _banner_attempt >= 0:
 		_destroy_all_banners()
 	_banner_top = top
-	_try_banner(_next_supporting(BANNER, 0))
+	_banner_house = _house_turn(BANNER, prefer)
+	_try_banner(_crossindie_index(BANNER) if _banner_house else _next_supporting(BANNER, 0))
 
 
 func hide_banner() -> void:
@@ -221,6 +263,7 @@ func _destroy_all_banners() -> void:
 		p.destroy_banner()
 	_banner_active = -1
 	_banner_attempt = -1
+	_banner_house = false
 	if _banner_timer != null:
 		_banner_timer.stop()
 
@@ -245,7 +288,7 @@ func _banner_loaded(index: int) -> void:
 	else:
 		p.hide_banner()
 	banner_loaded.emit(p.provider_name())
-	if index > 0:
+	if index > 0 and not _banner_house:
 		_schedule_banner_retry()  # try to upgrade to a better provider later
 
 
@@ -253,6 +296,13 @@ func _banner_failed(index: int, error: String) -> void:
 	ad_failed.emit(BANNER, _providers[index].provider_name(), error)
 	if index != _banner_attempt:
 		return  # failure of the active provider's refresh: keep showing it
+	if _banner_house and _banner_active < 0:
+		# CrossIndie had nothing on its share turn: use the normal chain.
+		_banner_house = false
+		var first: int = _next_supporting(BANNER, 0, index)
+		if first >= 0:
+			_try_banner(first)
+			return
 	# Only providers ranked above the one on screen are worth trying.
 	var next: int = _next_supporting(BANNER, index + 1, _banner_active)
 	if next >= 0:
@@ -271,7 +321,7 @@ func _schedule_banner_retry() -> void:
 
 
 func _on_banner_timer() -> void:
-	if not _banner_wanted or _banner_attempt >= 0:
+	if not _banner_wanted or _banner_attempt >= 0 or _banner_house:
 		return
 	if _banner_active == 0:
 		return  # already on the best provider
@@ -284,8 +334,10 @@ func _on_banner_timer() -> void:
 # Interstitial / rewarded
 # --------------------------------------------------------------------------- #
 
-func load_interstitial() -> void:
-	_load_fullscreen(INTERSTITIAL)
+## prefer: "" = crossindie_share decides, "crossindie" = CrossIndie first,
+## "admob" (any other id) = normal chain.
+func load_interstitial(prefer: String = "") -> void:
+	_load_fullscreen(INTERSTITIAL, prefer)
 
 func is_interstitial_ready() -> bool:
 	return _ready_provider(INTERSTITIAL) != null
@@ -295,8 +347,10 @@ func is_interstitial_ready() -> bool:
 func show_interstitial() -> bool:
 	return _show_fullscreen(INTERSTITIAL)
 
-func load_rewarded() -> void:
-	_load_fullscreen(REWARDED)
+## Never shared by crossindie_share; prefer "crossindie" forces it (no reward
+## unless rewarded_fallback_grants_reward is on).
+func load_rewarded(prefer: String = "") -> void:
+	_load_fullscreen(REWARDED, prefer)
 
 func is_rewarded_ready() -> bool:
 	return _ready_provider(REWARDED) != null
@@ -307,7 +361,7 @@ func show_rewarded() -> bool:
 	return _show_fullscreen(REWARDED)
 
 
-func _load_fullscreen(format: String) -> void:
+func _load_fullscreen(format: String, prefer: String = "") -> void:
 	if not _require_init(format):
 		return
 	if int(_fs_attempt[format]) >= 0:
@@ -315,12 +369,22 @@ func _load_fullscreen(format: String) -> void:
 	if _ready_provider(format) != null:
 		_emit_loaded(format, _ready_provider(format))
 		return
-	var first: int = _next_supporting(format, 0)
-	if first < 0:
+	var order: Array[int] = []
+	for i in _providers.size():
+		if _providers[i].supports(format):
+			order.append(i)
+	if order.is_empty():
 		ad_failed.emit(format, "", "no provider supports %s" % format)
 		return
-	_fs_attempt[format] = first
-	_call_load(format, _providers[first])
+	_fs_preferred[format] = null
+	if _house_turn(format, prefer):
+		var ci: int = _crossindie_index(format)
+		order.erase(ci)
+		order.push_front(ci)
+		_fs_preferred[format] = _providers[ci]
+	_fs_order[format] = order
+	_fs_attempt[format] = order[0]
+	_call_load(format, _providers[order[0]])
 
 
 func _call_load(format: String, p: ProviderBase) -> void:
@@ -337,6 +401,9 @@ func _is_ready(format: String, p: ProviderBase) -> bool:
 
 
 func _ready_provider(format: String) -> ProviderBase:
+	var pref: ProviderBase = _fs_preferred[format]
+	if pref != null and _is_ready(format, pref):
+		return pref
 	for p in _providers:
 		if p.supports(format) and _is_ready(format, p):
 			return p
@@ -353,6 +420,7 @@ func _show_fullscreen(format: String) -> bool:
 			_load_fullscreen(format)
 		return false
 	_fs_showing[format] = p
+	_fs_preferred[format] = null
 	if format == INTERSTITIAL:
 		p.show_interstitial()
 	else:
@@ -377,8 +445,10 @@ func _fullscreen_failed(format: String, index: int, error: String) -> void:
 	ad_failed.emit(format, _providers[index].provider_name(), error)
 	if index != int(_fs_attempt[format]):
 		return
-	var next: int = _next_supporting(format, index + 1)
-	if next >= 0:
+	var order: Array = _fs_order[format]
+	var pos: int = order.find(index)
+	if pos >= 0 and pos + 1 < order.size():
+		var next: int = int(order[pos + 1])
 		_fs_attempt[format] = next
 		_call_load(format, _providers[next])
 	else:
