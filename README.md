@@ -16,7 +16,7 @@ product and embed it freely.
 |----------|------|--------------|
 | **Web** | [`web/`](web) | npm `@crossindie/web`, or `<script src=".../embed.js">` |
 | **Godot 4.x** | [`godot/`](godot) | copy the addon into `res://addons/` |
-| **Godot 4.2+ Ads** (AdMob + CrossIndie fallback) | [`godot/addons/crossindie_ads`](godot/addons/crossindie_ads) | copy `crossindie_ads` + `cross_indie` into `res://addons/` |
+| **Godot 4.2+ Ads** (AdMob + CrossIndie fallback) | [`godot/addons/crossindie_ads`](godot/addons/crossindie_ads) | [release zip](https://github.com/Cross-Indie/godot-admob/releases/latest) or copy `crossindie_ads` + `cross_indie` into `res://addons/` |
 | **Unity** | [`unity/`](unity) | UPM: add from git URL (see below) |
 | **Unreal Engine 5** | [`unreal/`](unreal) | copy the plugin into `Plugins/` |
 | **Flutter** | [`flutter/`](flutter) | pub git dependency (`path: flutter`), pub.dev `crossindie` later |
