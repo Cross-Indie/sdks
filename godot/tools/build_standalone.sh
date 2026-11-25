@@ -19,6 +19,7 @@ rsync -a "${ex[@]}" "$here/crossindie_ads_android/" "$out/android/"
 rsync -a "${ex[@]}" --exclude addons --exclude README.md --exclude .gitignore \
   "$here/examples/crossindie_ads_demo/" "$out/"
 cp "$here/../LICENSE" "$out/LICENSE"
+rsync -a "${ex[@]}" "$here/media/" "$out/media/"
 
 # Paths in the standalone layout.
 sed -e 's#\[`../../crossindie_ads_android`\](../../crossindie_ads_android)#[`android/`](android/)#' \
@@ -41,6 +42,7 @@ G
 cat > "$out/.gitattributes" <<'G'
 # Asset Library / Download ZIP: ship addons/ only.
 /android         export-ignore
+/media           export-ignore
 /tests           export-ignore
 /main.gd         export-ignore
 /main.gd.uid     export-ignore

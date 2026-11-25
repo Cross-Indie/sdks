@@ -42,7 +42,8 @@ addon is a plain AdMob plugin.
 Verified end to end with Godot 4.7.2 on an Android 16 (API 36) arm64 emulator and a
 physical Samsung Galaxy M10 (Android 10, 32-bit armeabi-v7a): adaptive banner,
 interstitial and rewarded (Google test units) load, show, close and reward.
-4.2 – 4.6 are build-verified (AAR compiles against each template's SDK levels).
+4.2 – 4.6 are build-verified (AAR compiles against each template's SDK levels),
+and the GDScript side (editor plugin + all headless tests) runs on Godot 4.2.2 and 4.7.2.
 
 Override with Project Settings → `crossindie_ads/android/play_services_ads_version`.
 The bridge AAR is built against Godot 4.2.0 + play-services-ads 22.6.0 and

@@ -62,9 +62,13 @@ func _show_inter(_p: String) -> void:
 	_ev("show_interstitial:%s" % ok)
 	# The close button appears after 1s; press it after 2s.
 	get_tree().create_timer(2.0).timeout.connect(_press_close)
-	CrossIndieAds.interstitial_closed.connect(func(_x: String) -> void:
-		CrossIndieAds.rewarded_loaded.connect(_show_rewarded, CONNECT_ONE_SHOT)
-		CrossIndieAds.load_rewarded(), CONNECT_ONE_SHOT)
+	CrossIndieAds.interstitial_closed.connect(_after_inter, CONNECT_ONE_SHOT)
+
+
+# Named method, not a nested lambda: Godot 4.2 loses `self` in those.
+func _after_inter(_p: String) -> void:
+	CrossIndieAds.rewarded_loaded.connect(_show_rewarded, CONNECT_ONE_SHOT)
+	CrossIndieAds.load_rewarded()
 
 
 func _show_rewarded(_p: String) -> void:

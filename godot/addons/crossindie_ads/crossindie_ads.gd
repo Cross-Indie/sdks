@@ -42,7 +42,7 @@ signal ad_failed(format: String, provider: String, error: String)
 const BANNER := "banner"
 const INTERSTITIAL := "interstitial"
 const REWARDED := "rewarded"
-const VERSION := "0.2.0"
+const VERSION := "0.2.1"
 const CROSSINDIE := "crossindie"
 
 const Settings := preload("res://addons/crossindie_ads/settings.gd")
@@ -123,7 +123,7 @@ func initialize(config: Dictionary = {}) -> void:
 
 	if _providers.is_empty():
 		push_warning("CrossIndieAds: no ad provider available (is addons/cross_indie installed?)")
-	initialized.emit.call_deferred()
+	call_deferred("emit_signal", "initialized")  # Signal.emit.call_deferred() needs 4.3+
 
 
 ## Script for a provider id. Add new networks here.
