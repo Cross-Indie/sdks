@@ -40,7 +40,10 @@ android/local.properties
 .DS_Store
 G
 cat > "$out/.gitattributes" <<'G'
-# Asset Library / Download ZIP: ship addons/ only.
+# Asset Library / Download ZIP: ship addons/ only (LICENSE + README live in
+# each addons/<name>/ folder, so the root copies stay out of the zip).
+/LICENSE         export-ignore
+/README.md       export-ignore
 /android         export-ignore
 /media           export-ignore
 /tests           export-ignore

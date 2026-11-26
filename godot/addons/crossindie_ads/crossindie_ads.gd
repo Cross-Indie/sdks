@@ -42,7 +42,7 @@ signal ad_failed(format: String, provider: String, error: String)
 const BANNER := "banner"
 const INTERSTITIAL := "interstitial"
 const REWARDED := "rewarded"
-const VERSION := "0.2.1"
+const VERSION := "0.2.2"
 const CROSSINDIE := "crossindie"
 
 const Settings := preload("res://addons/crossindie_ads/settings.gd")
